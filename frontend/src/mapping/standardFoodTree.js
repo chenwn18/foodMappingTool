@@ -1,25 +1,32 @@
 import React, {Component} from 'react'
 import {Tree, Input, Popover, Table, Divider} from 'antd'
-import {getStandardFoods, getFieldFoods, getStandardAttributes} from "../lib/getData";
-import {findRootNodeID} from "../lib/toolFunction";
-import './main.css'
+import {
+    goThroughNodes,
+    getParentFoodID,
+    getRootFoodID,
+    getFoodNode,
+    getSynonymNames,
+    ID,
+    Name,
+    Path,
+    Entity,
+    getAttributeNode
+} from "../lib/getData";
+import './standardFoodTree.css'
 
 const {TreeNode} = Tree;
 const Search = Input.Search;
 
-const standardFoodNodeDict = getStandardFoods();
-const standardAttributesDict = getStandardAttributes();
-let generalFoods = {};
-const ParentID = 'parent_id';
-const Name = 'name';
-const ID = 'id';
-const Synonyms = 'synonyms';
-const Path = 'path';
-const Entity = 'entity';
-const rootID = findRootNodeID(standardFoodNodeDict);
-const getParentKey = (key) => {
-    return standardFoodNodeDict[key][ParentID];
-};
+// const standardFoodNodeDict = getStandardFoods();
+// const standardAttributesDict = getStandardAttributes();
+// const generalFoods = getFieldFoods();
+// const ParentID = 'parent_id';
+// const Name = 'name';
+// const ID = 'id';
+// const Synonyms = 'synonyms';
+// const Path = 'path';
+// const Entity = 'entity';
+// const rootID = findRootNodeID(standardFoodNodeDict);
 
 export class StandardFoodTree extends Component {
     state = {
@@ -36,7 +43,7 @@ export class StandardFoodTree extends Component {
     };
 
     containQueryValue = (item, value) => {
-        return item[Name].indexOf(value) > -1 || Object.keys(item[Synonyms]).join('|').indexOf(value) > -1;
+        return item[Name].indexOf(value) > -1 || getSynonymNames(item[ID]).join('|').indexOf(value) > -1;
     };
 
     onChange = (e) => {
@@ -49,9 +56,9 @@ export class StandardFoodTree extends Component {
             });
             return;
         }
-        const expandedKeys = Object.values(standardFoodNodeDict).map((item) => {
+        const expandedKeys = goThroughNodes((item) => {
             if (this.containQueryValue(item, value)) {
-                return getParentKey(item[ID]);
+                return getParentFoodID(item[ID]);
             }
             return null;
         }).filter((item) => item);
@@ -65,16 +72,13 @@ export class StandardFoodTree extends Component {
         const entityDict = item[Entity];
         let entityData = [];
         for (let field in entityDict) {
-            if (!(field in generalFoods)) {
-                generalFoods[field] = getFieldFoods(field);
-            }
             for (let entityID in entityDict[field]) {
-                let foodNode = generalFoods[field][entityID];
-                let attributeNodes = entityDict[field][entityID].map(attributeID => standardAttributesDict[attributeID][Name]);
+                let foodNode = getFoodNode(entityID, field);
+                let attributeNames = entityDict[field][entityID].map(attributeID => getAttributeNode(attributeID)[Name]);
                 entityData.push({
                     field: field,
                     name: foodNode[Name],
-                    attribute: attributeNodes.join('|'),
+                    attribute: attributeNames.join('|'),
                     path: foodNode[Path]
                 })
             }
@@ -85,7 +89,7 @@ export class StandardFoodTree extends Component {
             key: 'field',
             render: text => <a href="javascript:">{text}</a>
         }, {
-            title: '名称',
+            title: '实体名称',
             dataIndex: 'name',
             key: 'name'
         }, {
@@ -94,7 +98,7 @@ export class StandardFoodTree extends Component {
             key: 'attribute',
             render: text => <a href="javascript:">{text}</a>
         }, {
-            title: '路径',
+            title: '实体路径',
             dataIndex: 'path',
             key: 'path'
         }, {
@@ -111,7 +115,7 @@ export class StandardFoodTree extends Component {
         return <Table columns={columns} dataSource={entityData}/>
     };
     detailContent = (item, searchValue) => {
-        let synonyms = Object.keys(item[Synonyms]).join('|');
+        let synonyms = getSynonymNames(item[ID]).join('|');
         const index = synonyms.indexOf(searchValue);
         const beforeStr = synonyms.substr(0, index);
         const afterStr = synonyms.substr(index + searchValue.length);
@@ -141,9 +145,9 @@ export class StandardFoodTree extends Component {
     render() {
         const {searchValue, expandedKeys, autoExpandParent} = this.state;
         const loop = IDs => IDs.map(id => {
-            const item = standardFoodNodeDict[id];
+            const item = getFoodNode(id);
             const index_origin = item[Name].indexOf(searchValue);
-            const index_synonym = Object.keys(item[Synonyms]).join('|').indexOf(searchValue);
+            const index_synonym = getSynonymNames(id).join('|').indexOf(searchValue);
             let title = <span>{item[Name]}</span>;
             if (index_origin > -1) {
                 const beforeStr = item[Name].substr(0, index_origin);
@@ -175,7 +179,7 @@ export class StandardFoodTree extends Component {
                     expandedKeys={expandedKeys}
                     autoExpandParent={autoExpandParent}
                 >
-                    {loop([rootID])}
+                    {loop([getRootFoodID()])}
                 </Tree>
             </div>
         );
