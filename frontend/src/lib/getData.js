@@ -1,29 +1,36 @@
-import generalFoods from '../testData/general_foods'
-import standardFoods from '../testData/standard_foods'
-import standardAttributes from '../testData/standard_attributes'
+import generalFoods from '../testData/general_foods';
+import standardFoods from '../testData/standard_foods';
+import standardAttributes from '../testData/standard_attributes';
+import {arrayToDict} from "./toolFunction";
 
 export function getStandardFoods() {
-    return standardFoods;
+    return arrayToDict(standardFoods)
 }
 
 export function getStandardAttributes() {
-    return standardAttributes;
+    return arrayToDict(standardAttributes)
 }
 
 export function getFieldFoods(field) {
     if (!(field in generalFoods))
-        return [];
-    return generalFoods[field];
+        return {};
+    return arrayToDict(generalFoods[field]);
 }
-
-export function getStandardFoodTree() {
-
-}
-
-export function getFieldFoodTree() {
-
-}
-
-export function getStandardAttributeTree() {
-
-}
+// export function getStandardFoodTree() {
+//     let idNodeDict = getStandardFoods();
+//     let rootID = findRootNodeID(idNodeDict);
+//     return makeTree(rootID, idNodeDict);
+// }
+//
+//
+// export function getFieldFoodTree(field) {
+//     let idNodeDict = getFieldFoods(field);
+//     let rootID = findRootNodeID(idNodeDict);
+//     return makeTree(rootID, idNodeDict);
+// }
+//
+// export function getStandardAttributeTree() {
+//     let idNodeDict = getStandardAttributes();
+//     let rootID = findRootNodeID(idNodeDict);
+//     return makeTree(rootID, idNodeDict);
+// }

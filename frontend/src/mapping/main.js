@@ -1,9 +1,8 @@
 import React, {Component} from 'react';
 import {Tree, Input, Col, Popover, Row} from 'antd';
-import OldFoodData from '../json/贵科院_食品_同义词'
-// import NewFoodData from '../json/新标准_食品_同义词'
-import chemData from '../json/chem.tmp'
+import {getFieldFoods, getStandardFoods} from "../lib/getData";
 import '../css/searchSynonym.css'
+import {StandardFoodTree} from "./standardFoodTree";
 
 const {TreeNode} = Tree;
 const Search = Input.Search;
