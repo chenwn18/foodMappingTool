@@ -1,4 +1,4 @@
-import os
+import os; os.chdir(os.path.join(__file__, *(['..'] * 3)))
 from backend.lib.config import CONFIG
 from backend.lib.tool_function_lib import load_json_file, save_json_file
 from shutil import copy2
@@ -64,7 +64,7 @@ class AllData(object):
     def load_standard_attributes():
         json_data = load_json_file(CONFIG.standard_attributes_file)
         result = dict()
-        for attribute in json_data.items():
+        for attribute in json_data:
             obj = StandardAttribute('', '', '')
             obj.from_json(attribute)
             result[obj.id] = obj
@@ -297,7 +297,7 @@ all_data = AllData()  # singleton
 def test():
     # you can write your own test codes here for test purpose
     # test for insert_standard_foods
-    root_id = CONFIG.generate_new_id('食品')
+    """ root_id = CONFIG.generate_new_id('食品')
     all_data.standard_foods[root_id] = StandardFoodNode(root_id, 'root', '')
     all_data.insert_standard_food('食品0', 'food1')
     all_data.insert_standard_food('食品0', 'food2')
@@ -308,7 +308,7 @@ def test():
     all_data.insert_standard_food('食品0', 'food7')
     all_data.insert_standard_food('食品1', 'food8')
     all_data.insert_standard_food('食品1', 'food9')
-    all_data.insert_standard_food('食品3', 'food10')
+    all_data.insert_standard_food('食品3', 'food10') """
 
 
 if __name__ == '__main__':
