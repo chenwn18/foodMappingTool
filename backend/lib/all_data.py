@@ -5,6 +5,7 @@ from shutil import copy2
 import time
 
 from backend.lib.basic_class import GeneralFoodNode, StandardFoodNode, StandardAttribute
+from backend.lib.candidate_class import CANDIDATE
 
 
 # 定义装饰器，实现版本管理功能
@@ -290,6 +291,34 @@ class AllData(object):
         """
         pass
 
+    def getCandidateIds(self, field: str, general_id: str):
+        """
+        提供候选标准ID的list
+        :param field: 领域名称
+        :param general_id: 普通领域ID
+        :return: 标准ID list
+        """
+        results = dict()
+        candidateIds = []
+        candidate = CANDIDATE(self.general_foods, self.standard_foods)
+        # 三系统映射给出的ID  first important
+        # -------------------------------------------------------------------------
+        idByGeneral = candidate.getSysID(field, general_id)
+        if len(idByGeneral) != 0:
+            candidateIds.extend(idByGeneral)
+
+        # 名称相似度和拓扑结构匹配
+        idBySameName = candidate.getBySimilarName(field, general_id)
+        if len(idBySameName) != 0:
+            for id in idBySameName:
+                if id[0] not in candidateIds:
+                    candidateIds.extend(id)
+        results['candidate_id'] = candidateIds
+        # -------------------------------------------------------------------------
+
+        candidateAttriIds = candidate.getAttriIds(field, general_id)
+        results['candidate_attribute'] = candidateAttriIds
+        return candidateIds
 
 all_data = AllData()  # singleton
 
@@ -309,6 +338,8 @@ def test():
     # all_data.insert_standard_food('食品1', 'food8')
     # all_data.insert_standard_food('食品1', 'food9')
     # all_data.insert_standard_food('食品3', 'food10')
+    # 化学657--鲤鱼  化学470--麦片
+    ids = all_data.getCandidateIds('化学', '化学657')
 
 
 if __name__ == '__main__':
