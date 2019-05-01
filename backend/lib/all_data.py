@@ -64,7 +64,7 @@ class AllData(object):
     def load_standard_attributes():
         json_data = load_json_file(CONFIG.standard_attributes_file)
         result = dict()
-        for attribute in json_data.items():
+        for attribute in json_data:
             obj = StandardAttribute('', '', '')
             obj.from_json(attribute)
             result[obj.id] = obj
