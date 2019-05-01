@@ -3,7 +3,7 @@ function deepCopy(node) {
     return JSON.parse(JSON.stringify(node));
 }
 
-function makeTree(rootID, idNodeDict) {
+export function makeTree(rootID, idNodeDict) {
     let tree = deepCopy(idNodeDict[rootID]);
     let childrenIDs = deepCopy(tree.children);
     tree.children = [];

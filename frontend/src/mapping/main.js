@@ -3,6 +3,7 @@ import {Row, Col} from "antd";
 import {GeneralFoodTree} from "./generalFoodTree";
 import {StandardFoodTree} from "./standardFoodTree";
 import './main.css'
+import {MappingBox} from "./mappingBox";
 
 export class MappingView extends Component {
     state = {
@@ -16,6 +17,9 @@ export class MappingView extends Component {
                     <Col span={8}>
                         <header><h2>化学污染物食品分类</h2></header>
                         <GeneralFoodTree field={this.state.field}/>
+                    </Col>
+                    <Col span={8}>
+                        <MappingBox/>
                     </Col>
                     <Col span={8}>
                         <header><h2>标准食品分类</h2></header>

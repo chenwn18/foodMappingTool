@@ -1,18 +1,8 @@
 import React, {Component} from 'react'
-import {Tree, Input, Popover, Table, Divider} from 'antd'
-import {
-    goThroughNodes,
-    getParentFoodID,
-    getRootFoodID,
-    getFoodNode,
-    getSynonymNames,
-    ID,
-    Name,
-    Path,
-    Entity,
-    getAttributeNode
-} from "../lib/getData";
+import {Tree, Input, Popover} from 'antd'
+import {goThroughNodes, getParentFoodID, getRootFoodID, getFoodNode, getSynonymNames, ID, Name} from "../lib/getData";
 import './standardFoodTree.css'
+import {StandardFoodDetail} from "./standardFoodDetail";
 
 const {TreeNode} = Tree;
 const Search = Input.Search;
@@ -68,79 +58,6 @@ export class StandardFoodTree extends Component {
             autoExpandParent: true,
         });
     };
-    entityTable = (item) => {
-        const entityDict = item[Entity];
-        let entityData = [];
-        for (let field in entityDict) {
-            for (let entityID in entityDict[field]) {
-                let foodNode = getFoodNode(entityID, field);
-                let attributeNames = entityDict[field][entityID].map(attributeID => getAttributeNode(attributeID)[Name]);
-                entityData.push({
-                    field: field,
-                    name: foodNode[Name],
-                    attribute: attributeNames.join('|'),
-                    path: foodNode[Path]
-                })
-            }
-        }
-        const columns = [{
-            title: '领域',
-            dataIndex: 'field',
-            key: 'field',
-            render: text => <a href="javascript:">{text}</a>
-        }, {
-            title: '实体名称',
-            dataIndex: 'name',
-            key: 'name'
-        }, {
-            title: '属性',
-            dataIndex: 'attribute',
-            key: 'attribute',
-            render: text => <a href="javascript:">{text}</a>
-        }, {
-            title: '实体路径',
-            dataIndex: 'path',
-            key: 'path'
-        }, {
-            title: '操作',
-            key: 'action',
-            render: (text, record) => (
-                <span>
-                    <a href="javascript:">删除</a>
-                    <Divider type='vertical'/>
-                    <a href="javascript:">修改</a>
-                </span>
-            )
-        }];
-        return <Table columns={columns} dataSource={entityData}/>
-    };
-    detailContent = (item, searchValue) => {
-        let synonyms = getSynonymNames(item[ID]).join('|');
-        const index = synonyms.indexOf(searchValue);
-        const beforeStr = synonyms.substr(0, index);
-        const afterStr = synonyms.substr(index + searchValue.length);
-        synonyms = index > -1 ? (
-            <span>
-                {beforeStr}
-                <span className="nameSearched">{searchValue}</span>
-                {afterStr}
-            </span>
-        ) : <span>{synonyms || '无'}</span>;
-        return (
-            <div>
-                <p>别称：{synonyms}</p>
-                <p>路径：{item[Path]}</p>
-                {this.entityTable(item)}
-            </div>
-        )
-    };
-    treeNodeTitleWithPopover = ((item, title, searchValue) => {
-        return (
-            <Popover placement='right' title={item[Name]} content={this.detailContent(item, searchValue)}>
-                {title}
-            </Popover>
-        );
-    });
 
     render() {
         const {searchValue, expandedKeys, autoExpandParent} = this.state;
@@ -165,7 +82,11 @@ export class StandardFoodTree extends Component {
                 )
             }
             return (
-                <TreeNode key={item[ID]} title={this.treeNodeTitleWithPopover(item, title, searchValue)}>
+                <TreeNode key={item[ID]} title={
+                    <Popover placement='right' title={item[Name]}
+                             content={<StandardFoodDetail id={item[ID]} searchValue={searchValue}/>}>
+                        {title}
+                    </Popover>}>
                     {loop(item.children)}
                 </TreeNode>
             );

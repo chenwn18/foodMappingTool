@@ -9,6 +9,7 @@ import {
     Name,
     ID, Path, Ontology, getRootFoodID
 } from "../lib/getData";
+import {GeneralFoodDetail} from "./generalFoodDetail";
 import './generalFoodTree.css'
 
 const {TreeNode} = Tree;
@@ -43,10 +44,7 @@ export class GeneralFoodTree extends Component {
     getOntologyNodes = (nodeID) => {
         return getOntologyNodes(nodeID, this.props.field);
     };
-    getAttributes = (nodeID, ontologyID) => {
-        let attributeNodes = getAttributeNodes(nodeID, ontologyID, this.props.field);
-        return attributeNodes.map(attNode => attNode[Name]);
-    };
+
     containQueryValue = (item, value) => {
         if (item[Name].indexOf(value) > -1)
             return true;
@@ -79,52 +77,6 @@ export class GeneralFoodTree extends Component {
             autoExpandParent: true,
         });
     };
-    ontologyTable = (item) => {
-        const ontologyNodes = this.getOntologyNodes(item[ID]);
-        const ontologyData = ontologyNodes.map(node => {
-            return {name: node[Name], attribute: this.getAttributes(item[ID], node[ID]).join('|'), path: node[Path]}
-        });
-        const columns = [{
-            title: '本体名称',
-            dataIndex: 'name',
-            key: 'name'
-        }, {
-            title: '属性',
-            dataIndex: 'attribute',
-            key: 'attribute',
-            render: text => <a href="javascript:">{text}</a>
-        }, {
-            title: '本体路径',
-            dataIndex: 'path',
-            key: 'path'
-        }, {
-            title: '操作',
-            key: 'action',
-            render: (text, record) => (
-                <span>
-                    <a href="javascript:">删除</a>
-                    <Divider type='vertical'/>
-                    <a href="javascript:">修改</a>
-                    <Divider type='vertical'/>
-                    <a href="javascript:">新增</a>
-                </span>
-            )
-        }];
-        return <Table columns={columns} dataSource={ontologyData}/>
-    };
-    detailContent = (item) => (
-        <div>
-            <p>路径：{item[Path]}</p>
-            {this.ontologyTable(item)}
-        </div>
-    );
-    treeNodeTitleWithPopover = ((item, title) => {
-        return (
-            <Popover placement='right' title={item[Name]} content={this.detailContent(item)}>
-                {title}
-            </Popover>
-        );
-    });
 
     render() {
         const {searchValue, expandedKeys, autoExpandParent} = this.state;
@@ -146,7 +98,11 @@ export class GeneralFoodTree extends Component {
                 );
             }
             return (
-                <TreeNode key={item[ID]} title={this.treeNodeTitleWithPopover(item, title)}>
+                <TreeNode key={item[ID]} title={
+                    <Popover placement='right' title={item[Name]}
+                             content={<GeneralFoodDetail field={this.props.field} id={item[ID]}/>}>
+                        {title}
+                    </Popover>}>
                     {loop(item.children)}
                 </TreeNode>
             );

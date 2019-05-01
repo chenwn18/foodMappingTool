@@ -1,7 +1,7 @@
 import generalFoods from '../testData/general_foods';
 import standardFoods from '../testData/standard_foods';
 import standardAttributes from '../testData/standard_attributes';
-import {arrayToDict, findRootNodeID} from "./toolFunction";
+import {arrayToDict, findRootNodeID, makeTree} from "./toolFunction";
 
 const standardFoodsDict = getStandardFoods();
 const standardAttributesDict = getStandardAttributes();
@@ -98,8 +98,8 @@ function getGeneralFoods() {
 //     return makeTree(rootID, idNodeDict);
 // }
 //
-// export function getStandardAttributeTree() {
-//     let idNodeDict = getStandardAttributes();
-//     let rootID = findRootNodeID(idNodeDict);
-//     return makeTree(rootID, idNodeDict);
-// }
+export function getStandardAttributeTree() {
+    let idNodeDict = getStandardAttributes();
+    let rootID = findRootNodeID(idNodeDict);
+    return makeTree(rootID, idNodeDict);
+}
