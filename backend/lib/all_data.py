@@ -460,7 +460,7 @@ class AllData(object):
                 raise Exception('删除映射关系失败！统一标准中没有id为%s的结点' % general_node.ontology[i])
             standard_node.entity[field].pop(general_id)
         return 'success'
-    @version_control
+
     def recoding(self):
         """
         根据当前的总体标准，按照以往的规则，为self.standard_nodes和self.standard_attributes设置编码
@@ -534,13 +534,14 @@ def test():
     all_data.modify_standard_food_info(new_food_id, 'test_food', 'test_note')
     all_data.modify_standard_food_synonyms(new_food_id, {'test_synonym': 'test_source'})
     
-
     new_attribute_id = all_data.insert_standard_attribute('属性3', 'test_attribute')
     all_data.add_mapping('化学', '化学3', '食品3', ['属性3'])
     all_data.delete_mapping('化学', '化学3')
     all_data.add_mapping('化学', '化学3', '食品3', [new_attribute_id])
+    
     all_data.delete_standard_attribute('属性3')
     all_data.delete_standard_food('食品3')
+    
     all_data.recoding()
 
 if __name__ == '__main__':
