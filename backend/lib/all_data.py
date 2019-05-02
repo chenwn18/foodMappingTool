@@ -460,7 +460,7 @@ class AllData(object):
                 raise Exception('删除映射关系失败！统一标准中没有id为%s的结点' % general_node.ontology[i])
             standard_node.entity[field].pop(general_id)
         return 'success'
-    
+    @version_control
     def recoding(self):
         """
         根据当前的总体标准，按照以往的规则，为self.standard_nodes和self.standard_attributes设置编码
@@ -472,28 +472,32 @@ class AllData(object):
                 if not child_num.get(id_):
                     child_num[id_] = 0
                 if item.name == 'root':
-                    assert len(item.children) <= 26
+                    assert len([c for c in item.children if standards[c].use_flag]) <= 26
                     code[id_] = code_prefix
                     for child in item.children:
-                        child_num[id_] += 1
-                        code[child] = code[id_] + chr(64 + child_num[id_])
+                        if standards[child].use_flag:
+                            child_num[id_] += 1
+                            code[child] = code[id_] + chr(64 + child_num[id_])
                 else:
                     if code_prefix == 'F0':
-                        assert len(item.children) <= 99
+                        assert len([c for c in item.children if standards[c].use_flag]) <= 99
                         for child in item.children:
-                            child_num[id_] += 1
-                            code[child] = code[id_] + '%d%d' % (child_num[id_] // 10, child_num[id_] % 10)
+                            if standards[child].use_flag:
+                                child_num[id_] += 1
+                                code[child] = code[id_] + '%d%d' % (child_num[id_] // 10, child_num[id_] % 10)
                     else:
+                        
                         for child in item.children:
-                            child_num[id_] += 1
-                            code[child] = code[id_] + ('' if standards[item.parent_id].name == 'root' else '.') + '%d%d' % (child_num[id_] // 10, child_num[id_] % 10) 
+                            if standards[child].use_flag:
+                                child_num[id_] += 1
+                                code[child] = code[id_] + ('' if standards[item.parent_id].name == 'root' else '.') + '%d%d' % (child_num[id_] // 10, child_num[id_] % 10) 
             return code
         
         for id_, item in sequence_code(self.standard_foods, 'F0').items():
-            self.standard_foods[id_].code = item
+            if self.standard_foods[id_].use_flag: self.standard_foods[id_].code = item
         
         for id_, item in sequence_code(self.standard_attributes, 'A').items():
-            self.standard_attributes[id_].code = item
+            if self.standard_attributes[id_].use_flag: self.standard_attributes[id_].code = item
 
     
     def conflict_detect(self, field: str):
@@ -524,20 +528,20 @@ def test():
     # all_data.insert_standard_food('食品1', 'food9')
     # all_data.insert_standard_food('食品3', 'food10')
     
-    # new_food_id = all_data.insert_standard_food('食品3', 'test_food')
-    # all_data.delete_standard_food(new_food_id)
-    # new_food_id = all_data.insert_standard_food('食品3', 'test_food')
-    # all_data.modify_standard_food_info(new_food_id, 'test_food', 'test_note')
-    # all_data.modify_standard_food_synonyms(new_food_id, {'test_synonym': 'test_source'})
-    # all_data.delete_standard_food('食品3')
-
-    # new_attribute_id = all_data.insert_standard_attribute('属性3', 'test_attribute')
-    # all_data.add_mapping('化学', '化学3', '食品3', ['属性3'])
-    # all_data.delete_mapping('化学', '化学3')
-    # all_data.add_mapping('化学', '化学3', '食品3', [new_attribute_id])
-    # all_data.delete_standard_attribute('属性3')
+    new_food_id = all_data.insert_standard_food('食品3', 'test_food')
+    all_data.delete_standard_food(new_food_id)
+    new_food_id = all_data.insert_standard_food('食品3', 'test_food')
+    all_data.modify_standard_food_info(new_food_id, 'test_food', 'test_note')
+    all_data.modify_standard_food_synonyms(new_food_id, {'test_synonym': 'test_source'})
     
-    # all_data.recoding()
+
+    new_attribute_id = all_data.insert_standard_attribute('属性3', 'test_attribute')
+    all_data.add_mapping('化学', '化学3', '食品3', ['属性3'])
+    all_data.delete_mapping('化学', '化学3')
+    all_data.add_mapping('化学', '化学3', '食品3', [new_attribute_id])
+    all_data.delete_standard_attribute('属性3')
+    all_data.delete_standard_food('食品3')
+    all_data.recoding()
 
 if __name__ == '__main__':
     test()
