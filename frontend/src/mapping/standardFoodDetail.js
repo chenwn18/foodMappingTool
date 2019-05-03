@@ -1,19 +1,32 @@
 import React, {Component} from 'react';
 import {Entity, getAttributeNode, getFoodNode, getSynonymNames, ID, Name, Path} from "../lib/getData";
 import {Divider, Popover, Table} from "antd";
+import {deleteMapping} from "../lib/postData";
 
 export class StandardFoodDetail extends Component {
+    deleteMapping = (generalID, field) => {
+        deleteMapping(generalID, this.props.id, field);
+        return false;
+    };
+    modifyMapping = (generalID, field, attributeIDs) => {
+        this.props.setStandardFoodID(this.props.id);
+        this.props.setGeneralFoodID(generalID);
+        this.props.setStandardAttributeIDs(attributeIDs);
+        return false;
+    };
     entityTable = (item) => {
         const entityDict = item[Entity];
         let entityData = [];
         for (let field in entityDict) {
             for (let entityID in entityDict[field]) {
                 let foodNode = getFoodNode(entityID, field);
-                let attributeNames = entityDict[field][entityID].map(attributeID => getAttributeNode(attributeID)[Name]);
+                let attributeIDs = entityDict[field][entityID];
                 entityData.push({
+                    key: entityID,
                     field: field,
                     name: foodNode[Name],
-                    attribute: attributeNames.join('|'),
+                    attribute: attributeIDs.map(attributeID => getAttributeNode(attributeID)[Name]).join('|'),
+                    attributeIDs: attributeIDs,
                     path: foodNode[Path]
                 })
             }
@@ -41,9 +54,9 @@ export class StandardFoodDetail extends Component {
             key: 'action',
             render: (text, record) => (
                 <span>
-                    <a href="javascript:">删除</a>
+                    <a href="#" onClick={() => this.deleteMapping(record.key, record.field)}>删除</a>
                     <Divider type='vertical'/>
-                    <a href="javascript:">修改</a>
+                    <a href="#" onClick={() => this.modifyMapping(record.key, record.field, record.attributeIDs)}>修改</a>
                 </span>
             )
         }];

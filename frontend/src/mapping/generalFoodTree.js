@@ -77,6 +77,9 @@ export class GeneralFoodTree extends Component {
             autoExpandParent: true,
         });
     };
+    onSelect = (selectedKeys) => {
+        this.props.setGeneralFoodID(selectedKeys[0]);
+    };
 
     render() {
         const {searchValue, expandedKeys, autoExpandParent} = this.state;
@@ -115,6 +118,7 @@ export class GeneralFoodTree extends Component {
                     onExpand={this.onExpand}
                     expandedKeys={expandedKeys}
                     autoExpandParent={autoExpandParent}
+                    onSelect={this.onSelect}
                 >
                     {loop([getRootFoodID(this.props.field)])}
                 </Tree>

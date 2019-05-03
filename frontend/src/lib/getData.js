@@ -92,14 +92,25 @@ function getGeneralFoods() {
 // }
 //
 //
-// export function getFieldFoodTree(field) {
-//     let idNodeDict = getFieldFoods(field);
-//     let rootID = findRootNodeID(idNodeDict);
-//     return makeTree(rootID, idNodeDict);
-// }
-//
+export function getGeneralFoodTree() {
+    let idNodeDict = getGeneralFoods();
+    let result = {};
+    for (let field in idNodeDict) {
+        let rootID = findRootNodeID(idNodeDict[field]);
+        result[field] = makeTree(rootID, idNodeDict[field]);
+    }
+    return result;
+}
+
 export function getStandardAttributeTree() {
     let idNodeDict = getStandardAttributes();
     let rootID = findRootNodeID(idNodeDict);
     return makeTree(rootID, idNodeDict);
+}
+
+export function getCandidateFoodIDs(generalID, field) {
+    return ['食品2', '食品3', '食品4'];
+}
+export function getCandidateAttributeIDs(generalID, field) {
+    return ['属性2', '属性3', '属性4'];
 }

@@ -84,7 +84,10 @@ export class StandardFoodTree extends Component {
             return (
                 <TreeNode key={item[ID]} title={
                     <Popover placement='right' title={item[Name]}
-                             content={<StandardFoodDetail id={item[ID]} searchValue={searchValue}/>}>
+                             content={<StandardFoodDetail id={item[ID]} searchValue={searchValue}
+                                                          setStandardFoodID={this.props.setStandardFoodID.bind(this)}
+                                                          setStandardAttributeIDs={this.props.setStandardAttributeIDs.bind(this)}
+                                                          setGeneralFoodID={this.props.setGeneralFoodID.bind(this)}/>}>
                         {title}
                     </Popover>}>
                     {loop(item.children)}

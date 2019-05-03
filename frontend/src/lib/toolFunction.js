@@ -1,4 +1,4 @@
-function deepCopy(node) {
+export function deepCopy(node) {
     // ToDo: replace it by a deep copy function suitable for any type of object or array
     return JSON.parse(JSON.stringify(node));
 }
