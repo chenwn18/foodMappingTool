@@ -1,4 +1,4 @@
-import os
+import os; os.chdir(os.path.join(__file__, *(['..'] * 3)))
 from backend.lib.config import CONFIG
 from backend.lib.tool_function_lib import load_json_file, save_json_file
 from shutil import copy2
@@ -11,8 +11,135 @@ from backend.lib.candidate_class import CANDIDATE
 # 定义装饰器，实现版本管理功能
 def version_control(func):
     def wrapper(self, *args, **kwargs):
+        # record operation history into nodes as: 
+        # [{
+        #   'time': timestamp, 'called': the_name_of_function_called, 
+        #   'data': input_arguments_and_other_information,
+        #   'description': formatted string based on 'data' above, one can comment or delete it, if not needed
+        # }, {.}, ...]
+        func_name = func.__name__.split('_')
+        args_dict = dict(zip(func.__code__.co_varnames[1: 1 + len(args)], args)); args_dict.update(kwargs)
         try:
-            result = func(self, *args, **kwargs)
+            if len(func_name) > 2: 
+                if func_name[1] == 'standard': 
+                    if func_name[2] == 'food':
+                        if func_name[0] == 'modify':
+                            food_id = args_dict['food_id']
+                            old_name, old_note = self.standard_foods[food_id].name, self.standard_foods[food_id].note
+                            old_synonyms = self.standard_foods[food_id].synonyms
+                            
+                            result = func(self, *args, **kwargs)
+                            
+                            if not hasattr(self.standard_foods[food_id], 'history'): self.standard_foods[food_id].history = []
+                            self.standard_foods[food_id].history.append({'time': round(time.time()), 'called': func.__name__})
+                            history = self.standard_foods[food_id].history[-1]
+                            
+                            if func_name[3] == 'info':
+                                history.update({
+                                    'data': {'id': food_id, 'old_name': old_name, 'old_note': old_note, 'new_name': args_dict['new_name'], 'new_note': args_dict['new_note']},
+                                    'description': '%s - modify standard food info [%s] (id:[%s], name:[%s], note:[%s])' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.standard_foods[food_id].name, food_id, ' -> '.join([old_name, args_dict['new_name']]), ' -> '.join([old_note, args_dict['new_note']])), 
+                                })
+                            elif func_name[3] == 'synonyms':
+                                history.update({
+                                    'data': {'id': food_id, 'old_synonyms': old_synonyms, 'new_synonyms': args_dict['new_synonyms']},
+                                    'description': '%s - modify standard food synonyms [%s] (id:[%s], synonyms: %s)' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.standard_foods[food_id].name, food_id, ' -> '.join([repr(old_synonyms), repr(args_dict['new_synonyms'])])), 
+                                })
+                        else:
+                            result = func(self, *args, **kwargs)
+                            
+                            if not hasattr(self.standard_foods[result], 'history'): self.standard_foods[result].history = []
+                            self.standard_foods[result].history.append({'time': round(time.time()), 'called': func.__name__})
+                            history = self.standard_foods[result].history[-1]
+                            
+                            if func_name[0] == 'insert':
+                                history.update({
+                                    'data': {'id': result, 'parent_id': args_dict['parent_id'], 'name': args_dict['name'], 'note': args_dict.get('note', '')},
+                                    'description': '%s - insert standard food [%s] (id:[%s], parend_id:[%s])' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), args_dict['name'], result, args_dict['parent_id']), 
+                                })
+                            elif func_name[0] == 'delete':
+                                history.update({
+                                    'data': {'id': result},
+                                    'description': '%s - delete standard food [%s] (id:[%s])' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.standard_foods[result].name, result), 
+                                })
+                    elif func_name[2] == 'attribute':
+                        result = func(self, *args, **kwargs)
+                        
+                        if not hasattr(self.standard_attributes[result], 'history'): self.standard_attributes[result].history = []
+                        self.standard_attributes[result].history.append({'time': round(time.time()), 'called': func.__name__})
+                        history = self.standard_attributes[result].history[-1]
+                        
+                        if func_name[0] == 'insert':
+                            history.update({
+                                'data': {'id': result, 'parent_id': args_dict['parent_id'], 'name': args_dict['name'], 'note': args_dict.get('note', '')},
+                                'description': '%s - insert standard attribute [%s] (id:[%s], parent_id:[%s])' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), args_dict['name'], result, args_dict['parent_id']), 
+                            })
+                        elif func_name[0] == 'delete':
+                            history.update({
+                                'data': {'id': result},
+                                'description': '%s - delete standard attribute [%s] (id:[%s])' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.standard_attributes[result].name, result), 
+                            })
+                elif func_name[1] == 'general':
+                    result = func(self, *args, **kwargs)
+                    
+                    field = args_dict['field']
+                    if not hasattr(self.general_foods[field][result], 'history'): self.general_foods[field][result].history = []
+                    self.general_foods[field][result].history.append({'time': round(time.time()), 'called': func.__name__})
+                    history = self.general_foods[field][result].history[-1]
+                    
+                    if func_name[0] == 'insert':
+                        history.update({
+                            'data': {'id': result, 'parent_id': args_dict['parent_id'], 'name': args_dict['name'], 'note': args_dict.get('note', ''), 'ontology': args_dict.get('ontology', [])},
+                            'description': '%s - insert general food [%s] (id:[%s], parent_id:[%s])' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), args_dict['name'], result, args_dict['parent_id']), 
+                        })
+            elif len(func_name) == 2:
+                if func_name[1] == 'mapping':
+                    current_timestamp = round(time.time())
+                    
+                    if func_name[0] == 'add':
+                        result = func(self, *args, **kwargs)
+                        field, general_id, standard_id, attribute_ids = args_dict['field'], args_dict['general_id'], args_dict['standard_id'], args_dict['attribute_ids']
+                        
+                        if not hasattr(self.standard_foods[standard_id], 'history'): self.standard_foods[standard_id].history = []
+                        self.standard_foods[standard_id].history.append({'time': current_timestamp, 'called': func.__name__})
+                        standard_history = self.standard_foods[standard_id].history[-1]
+                
+                        if not hasattr(self.general_foods[field][general_id], 'history'): self.general_foods[field][general_id].history = []
+                        self.general_foods[field][general_id].history.append({'time': current_timestamp, 'called': func.__name__})
+                        general_history = self.general_foods[field][general_id].history[-1]
+                        
+                        standard_history.update({
+                            'data': {'id': standard_id, 'field': field, 'general_id': general_id, 'attribute_id': attribute_ids},
+                            'description': '%s - add mapping between [%s] (id:[%s]) and [%s]:[%s] (id:[%s]) with attribute [%s] (id:[%s])' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.standard_foods[standard_id].name, standard_id, field, self.general_foods[field][general_id].name, general_id, ', '.join([self.standard_attributes[ai].name for ai in attribute_ids]), ', '.join(attribute_ids))
+                        })
+                        general_history.update({
+                            'data': {'id': general_id, 'standard_id': standard_id, 'attribute_id': attribute_ids},
+                            'description': '%s - add mapping between [%s] (id:[%s]) and standard food [%s] (id:[%s]) with attribute [%s] (id:[%s])' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.general_foods[field][general_id].name, general_id, self.standard_foods[standard_id].name, standard_id, ', '.join([self.standard_attributes[ai].name for ai in attribute_ids]), ', '.join(attribute_ids))
+                        })
+                    
+                    elif func_name[0] == 'delete':
+                        field, general_id = args_dict['field'], args_dict['general_id']
+                        standard_ids = self.general_foods[field][general_id].ontology
+            
+                        if not hasattr(self.general_foods[field][general_id], 'history'): self.general_foods[field][general_id].history = []
+                        self.general_foods[field][general_id].history.append({'time': current_timestamp, 'called': func.__name__})
+                        general_history = self.general_foods[field][general_id].history[-1] 
+                        general_history.update({
+                            'data': {'id': general_id, 'standard_ids': standard_ids},
+                            'description': '%s - delete mapping between [%s] (id:[%s]) and standard food [%s] (id:[%s])' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.general_foods[field][general_id].name, general_id, ', '.join([self.standard_foods[standard_id].name for standard_id in standard_ids]), ', '.join(standard_ids))
+                        })
+                        
+                        for standard_id in standard_ids:
+                            if not hasattr(self.standard_foods[standard_id], 'history'): self.standard_foods[standard_id].history = []
+                            self.standard_foods[standard_id].history.append({'time': current_timestamp, 'called': func.__name__})
+                            standard_history = self.standard_foods[standard_id].history[-1]
+                            standard_history.update({
+                                'data': {'id': standard_id, 'field': field, 'general_id': general_id},
+                                'description': '%s - delete mapping between [%s] (id:[%s]) and [%s]:[%s] (id:[%s])' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), self.standard_foods[standard_id].name, standard_id, field, self.general_foods[field][general_id].name, general_id)
+                            })
+                        
+                        result = func(self, *args, **kwargs)
+            else:
+                result = func(self, *args, **kwargs)
         except Exception as e:
             return str(e)
         # 没有出现异常，为有效操作
@@ -166,10 +293,10 @@ class AllData(object):
 
         # 递归设置当前结点及其孩子结点的use_flag，并移除相关映射关系
         def deprecate_food_and_its_children(root_id: str):
-            root: StandardFoodNode = self.standard_foods[food_id]
+            root: StandardFoodNode = self.standard_foods[root_id]
             root.stop_in_use()  # 设置use_flag为False
             # 将该food_id从对应的各领域结点的ontology字段中移除
-            for field, entity in root.entity:
+            for field, entity in root.entity.items():
                 for general_id in entity.keys():
                     general_node: GeneralFoodNode = self.general_foods[field][general_id]
                     general_node.ontology.remove(root_id)
@@ -189,7 +316,13 @@ class AllData(object):
         :param new_note:
         :return:
         """
-        pass
+        if food_id not in self.standard_foods:
+            raise Exception('修改标准食品信息失败！该结点%s不存在' % food_id)
+        food_node: StandardFoodNode = self.standard_foods[food_id]
+        if food_node.use_flag is False:
+            raise Exception('修改标准食品信息失败！该食品已被移除，建议刷新页面以查看最新版本')
+        food_node.modify_info(new_name, new_note)
+        return 'success'
 
     @version_control
     def modify_standard_food_synonyms(self, food_id: str, new_synonyms: dict):
@@ -239,7 +372,47 @@ class AllData(object):
         :param attribute_id:
         :return:
         """
-        pass
+        if attribute_id not in self.standard_attributes:
+            raise Exception('删除标准属性失败！该结点%s不存在' % attribute_id)
+        attribute_node: StandardAttribute = self.standard_attributes[attribute_id]
+        if attribute_node.use_flag is False:
+            raise Exception('删除标准属性失败！该属性已被移除，建议刷新页面以查看最新版本')
+        # 从父结点的children中移除当前结点
+        parent_node: StandardAttribute = self.standard_attributes[attribute_node.parent_id]
+        parent_node.remove_child(attribute_id)
+
+        def get_attribute_and_its_children_id(root_id):
+            def get_children_id(root_id):
+                id_list_ = []
+                for child_id in self.standard_attributes[root_id].children:
+                    id_list_ += get_children_id(child_id)
+                return self.standard_attributes[root_id].children + id_list_
+            return [root_id] + get_children_id(root_id)
+
+        id_list = get_attribute_and_its_children_id(attribute_id)
+
+        def remove_attributes_in_mapping(root_id, id_list):
+            root = self.standard_foods[root_id]
+            for field, entity in root.entity.items():
+                for general_id, attribute_ids in entity.items():
+                    for ai in attribute_ids:
+                        if ai in id_list:
+                            attribute_ids.remove(ai)
+            for child_id in self.standard_foods[root_id].children:
+                remove_attributes_in_mapping(child_id, id_list)
+        
+        remove_attributes_in_mapping('食品0', id_list)
+        
+        # 递归设置当前结点及其孩子结点的use_flag，并移除相关映射关系
+        def deprecate_attribute_and_its_children(root_id: str):
+            root: StandardAttribute = self.standard_attributes[root_id]
+            root.stop_in_use()  # 设置use_flag为False
+            # 深度优先遍历，移除所有孩子结点
+            for child_id in root.children:
+                deprecate_attribute_and_its_children(child_id)
+
+        deprecate_attribute_and_its_children(attribute_id)
+        return attribute_id
 
     @version_control
     def add_mapping(self, field: str, general_id: str, standard_id: str, attribute_ids: list):
@@ -274,15 +447,60 @@ class AllData(object):
         :param general_id:
         :return:
         """
-        pass
+        if field not in self.general_foods:
+            raise Exception('删除映射关系失败！领域名称“%s”错误!' % field)
+        general_node: GeneralFoodNode = self.general_foods[field].get(general_id, None)
+        if general_node is None:
+            raise Exception('删除映射关系失败！领域“%s”中没有id为%s的结点！' % (field, general_node))
+        if general_node.use_flag is False:
+            raise Exception('删除映射关系失败！映射结点已被删除，建议刷新页面以查看最新版本')
+        for i in range(len(general_node.ontology) - 1, -1, -1):
+            standard_node: StandardFoodNode = self.standard_foods.get(general_node.ontology[i], None)
+            general_node.remove_ontology(general_node.ontology[i])
+            if standard_node is None:
+                raise Exception('删除映射关系失败！统一标准中没有id为%s的结点' % general_node.ontology[i])
+            standard_node.entity[field].pop(general_id)
+        return 'success'
 
     def recoding(self):
         """
         根据当前的总体标准，按照以往的规则，为self.standard_nodes和self.standard_attributes设置编码
         :return:
         """
-        pass
+        def sequence_code(standards, code_prefix):
+            code, child_num = {}, {}
+            for id_, item in standards.items():
+                if not child_num.get(id_):
+                    child_num[id_] = 0
+                if item.name == 'root':
+                    assert len([c for c in item.children if standards[c].use_flag]) <= 26
+                    code[id_] = code_prefix
+                    for child in item.children:
+                        if standards[child].use_flag:
+                            child_num[id_] += 1
+                            code[child] = code[id_] + chr(64 + child_num[id_])
+                else:
+                    if code_prefix == 'F0':
+                        assert len([c for c in item.children if standards[c].use_flag]) <= 99
+                        for child in item.children:
+                            if standards[child].use_flag:
+                                child_num[id_] += 1
+                                code[child] = code[id_] + '%d%d' % (child_num[id_] // 10, child_num[id_] % 10)
+                    else:
+                        
+                        for child in item.children:
+                            if standards[child].use_flag:
+                                child_num[id_] += 1
+                                code[child] = code[id_] + ('' if standards[item.parent_id].name == 'root' else '.') + '%d%d' % (child_num[id_] // 10, child_num[id_] % 10) 
+            return code
+        
+        for id_, item in sequence_code(self.standard_foods, 'F0').items():
+            if self.standard_foods[id_].use_flag: self.standard_foods[id_].code = item
+        
+        for id_, item in sequence_code(self.standard_attributes, 'A').items():
+            if self.standard_attributes[id_].use_flag: self.standard_attributes[id_].code = item
 
+    
     def conflict_detect(self, field: str):
         """
         查找指定领域中映射存在冲突的结点
@@ -338,8 +556,25 @@ def test():
     # all_data.insert_standard_food('食品1', 'food8')
     # all_data.insert_standard_food('食品1', 'food9')
     # all_data.insert_standard_food('食品3', 'food10')
+    
+    new_food_id = all_data.insert_standard_food('食品3', 'test_food')
+    all_data.delete_standard_food(new_food_id)
+    new_food_id = all_data.insert_standard_food('食品3', 'test_food')
+    all_data.modify_standard_food_info(new_food_id, 'test_food', 'test_note')
+    all_data.modify_standard_food_synonyms(new_food_id, {'test_synonym': 'test_source'})
+    
+    new_attribute_id = all_data.insert_standard_attribute('属性3', 'test_attribute')
+    all_data.add_mapping('化学', '化学3', '食品3', ['属性3'])
+    all_data.delete_mapping('化学', '化学3')
+    all_data.add_mapping('化学', '化学3', '食品3', [new_attribute_id])
+    
+    all_data.delete_standard_attribute('属性3')
+    all_data.delete_standard_food('食品3')
+    
+    all_data.recoding()
+
     # 化学657--鲤鱼  化学470--麦片
-    ids = all_data.getCandidateIds('化学', '化学657')
+    # ids = all_data.getCandidateIds('化学', '化学657')
 
 
 if __name__ == '__main__':
