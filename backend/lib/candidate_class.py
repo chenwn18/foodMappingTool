@@ -245,6 +245,8 @@ class CANDIDATE(object):
             if node.id == self.field_node.parent_id:
                 parent_node = node
                 break
+        if parent_node == None:
+            return attributs
         parent_nodes = []
         node = self.general_foods[field][field_code2sysid.get(parent_node.code)]
         parent_nodes.append(node)
@@ -266,6 +268,8 @@ class CANDIDATE(object):
             if genreral_id in gsId:
                 reflection = gsId
                 break
+        if reflection == None:
+            return attributes
         if field == '化学':
             if reflection[1] != None:
                 break_node = self.general_foods['暴发'][reflection[1]]
