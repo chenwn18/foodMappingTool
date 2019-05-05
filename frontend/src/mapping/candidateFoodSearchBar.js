@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {Divider, Popover, Select} from 'antd';
-import {getFoodNode, getSynonymNames, goThroughNodes, ID, Name, Path} from "../lib/getData";
+import {getFoodNode, getSynonymNames, goThroughFoodNodes, ID, Name, Path} from "../lib/getData";
 import {StandardFoodDetail} from "./standardFoodDetail";
 import {deepCopy} from "../lib/toolFunction";
 
@@ -42,7 +42,7 @@ export class CandidateFoodSearchBar extends Component {
             });
         } else
             this.setState({
-                optionIDs: goThroughNodes(d => d).filter(node => {
+                optionIDs: goThroughFoodNodes(d => d).filter(node => {
                     return node[Name].indexOf(val) > -1 || getSynonymNames(node[ID]).join('|').indexOf(val) > -1;
                 }).map(node => node[ID]).filter((d, i, self) => self.indexOf(d) === i)
             });

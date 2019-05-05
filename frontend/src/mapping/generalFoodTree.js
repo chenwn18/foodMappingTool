@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {Tree, Input, Popover, Table, Divider} from 'antd'
 import {
-    goThroughNodes,
+    goThroughFoodNodes,
     getParentFoodID,
     getFoodNode,
     getOntologyNodes,
@@ -11,6 +11,7 @@ import {
 } from "../lib/getData";
 import {GeneralFoodDetail} from "./generalFoodDetail";
 import './generalFoodTree.css'
+import Button from "antd/es/button";
 
 const {TreeNode} = Tree;
 const Search = Input.Search;
@@ -65,7 +66,7 @@ export class GeneralFoodTree extends Component {
             });
             return;
         }
-        const expandedKeys = goThroughNodes((item) => {
+        const expandedKeys = goThroughFoodNodes((item) => {
             if (this.containQueryValue(item, value)) {
                 return getParentFoodID(item[ID], this.props.field);
             }
@@ -78,7 +79,19 @@ export class GeneralFoodTree extends Component {
         });
     };
     onSelect = (selectedKeys) => {
+        if (!selectedKeys || selectedKeys.length === 0)
+            return;
+        console.log('generalFoodTree onselect: ' + selectedKeys);
         this.props.setGeneralFoodID(selectedKeys[0]);
+    };
+    showUnmapped = () => {
+        const expandedKeys = goThroughFoodNodes((item) => {
+            if (item[Ontology].length > 0) {
+                return getParentFoodID(item[ID], this.props.field);
+            }
+            return null;
+        }, this.props.field).filter((item) => item);
+        this.setState({expandedKeys});
     };
 
     render() {
@@ -114,6 +127,7 @@ export class GeneralFoodTree extends Component {
         return (
             <div>
                 <Search style={{marginBottom: 8}} placeholder="Search" onChange={this.onChange}/>
+                <Button onClick={this.showUnmapped} type="primary">查看所有未映射结点</Button>
                 <Tree
                     onExpand={this.onExpand}
                     expandedKeys={expandedKeys}

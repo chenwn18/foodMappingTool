@@ -46,9 +46,12 @@ export class CandidateAttributeSearchBar extends Component {
                 treeCheckable
                 treeCheckStrictly
                 style={{width: 300}}
-                value={this.props.IDs.map(id => {
-                    return {label: getAttributeNode(id)[Name], value: id}
-                })}
+                value={
+                    this.props.IDs
+                    .map(id => {
+                        return {label: getAttributeNode(id)[Name], value: id}
+                    })
+                }
                 // treeNodeLabelProp={Name}
                 // treeNodeFilterProp={Name}
                 filterTreeNode={this.filterTreeNode}

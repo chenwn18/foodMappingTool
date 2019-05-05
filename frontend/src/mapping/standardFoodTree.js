@@ -1,22 +1,11 @@
 import React, {Component} from 'react'
 import {Tree, Input, Popover} from 'antd'
-import {goThroughNodes, getParentFoodID, getRootFoodID, getFoodNode, getSynonymNames, ID, Name} from "../lib/getData";
+import {goThroughFoodNodes, getParentFoodID, getRootFoodID, getFoodNode, getSynonymNames, ID, Name} from "../lib/getData";
 import './standardFoodTree.css'
 import {StandardFoodDetail} from "./standardFoodDetail";
 
 const {TreeNode} = Tree;
 const Search = Input.Search;
-
-// const standardFoodNodeDict = getStandardFoods();
-// const standardAttributesDict = getStandardAttributes();
-// const generalFoods = getFieldFoods();
-// const ParentID = 'parent_id';
-// const Name = 'name';
-// const ID = 'id';
-// const Synonyms = 'synonyms';
-// const Path = 'path';
-// const Entity = 'entity';
-// const rootID = findRootNodeID(standardFoodNodeDict);
 
 export class StandardFoodTree extends Component {
     state = {
@@ -46,7 +35,7 @@ export class StandardFoodTree extends Component {
             });
             return;
         }
-        const expandedKeys = goThroughNodes((item) => {
+        const expandedKeys = goThroughFoodNodes((item) => {
             if (this.containQueryValue(item, value)) {
                 return getParentFoodID(item[ID]);
             }

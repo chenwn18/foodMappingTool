@@ -5,8 +5,8 @@ import {StandardFoodTree} from "./standardFoodTree";
 import {GeneralFoodSearchBar} from "./generalFoodSearchBar";
 import {CandidateFoodSearchBar} from "./candidateFoodSearchBar";
 import {CandidateAttributeSearchBar} from "./candidateAttributeSearchBar";
-import {addMapping} from "../lib/postData";
-import {getCandidateAttributeIDs, getCandidateFoodIDs} from "../lib/getData";
+import {getCandidate} from "../lib/getData";
+import {ConfirmMappingModal} from "./confirmMappingModal";
 import './main.css'
 
 export class MappingView extends Component {
@@ -18,37 +18,38 @@ export class MappingView extends Component {
         field: '化学'
     };
 
-    getCandidateFoodIDs(generalID) {
-        const candidateIDs = getCandidateFoodIDs(generalID, this.state.field) || [];
-        this.setState(state => state.candidateFoodIDs = candidateIDs);
+    getCandidate(generalID) {
+        getCandidate(generalID, this.state.field, (candidateFoodIDs, candidateAttributeIDs) =>
+            this.setState({
+                candidateFoodIDs: candidateFoodIDs,
+                standardAttributeIDs: candidateAttributeIDs
+            }));
     }
 
-    getCandidateAttributeIDs(generalID) {
-        const attributeIDs = getCandidateAttributeIDs(generalID, this.state.field) || [];
-        this.setState(state => state.standardAttributeIDs = attributeIDs);
-    }
+    // getCandidateFoodIDs(generalID) {
+    //     const candidateIDs = getCandidateFoodIDs(generalID, this.state.field) || [];
+    //     this.setState(state => state.candidateFoodIDs = candidateIDs);
+    // }
+    //
+    // getCandidateAttributeIDs(generalID) {
+    //     const attributeIDs = getCandidateAttributeIDs(generalID, this.state.field) || [];
+    //     this.setState(state => state.standardAttributeIDs = attributeIDs);
+    // }
 
     setStandardFoodID(id) {
-        console.log('food' + id);
         this.setState(state => state.standardFoodID = id);
     }
 
     setStandardAttributeIDs(ids) {
-        console.log('att' + ids);
         this.setState(state => state.standardAttributeIDs = ids);
     }
 
     setGeneralFoodID(id) {
-        console.log('general' + id);
         this.setState(state => state.generalFoodID = id);
-        this.getCandidateFoodIDs(id);
-        this.getCandidateAttributeIDs(id);
+        this.getCandidate(id);
+        // this.getCandidateFoodIDs(id);
+        // this.getCandidateAttributeIDs(id);
     }
-
-    //todo: 对话框提示确认，等待服务器返回结果
-    addMapping = () => {
-        addMapping(this.state.generalFoodID, this.state.standardFoodID, this.state.standardAttributeIDs);
-    };
 
     render() {
         return (
@@ -76,7 +77,11 @@ export class MappingView extends Component {
                                                          setStandardAttributeIDs={this.setStandardAttributeIDs.bind(this)}/>
                         </div>
                         <div>
-                            <Button onClick={this.addMapping} size='large' type='primary'>提交映射</Button>
+                            <ConfirmMappingModal generalID={this.state.generalFoodID}
+                                                 standardID={this.state.standardFoodID}
+                                                 standardAttributeIDs={this.state.standardAttributeIDs}
+                                                 field={this.state.field}/>
+
                         </div>
                     </Col>
                     <Col span={8}>

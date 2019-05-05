@@ -1,0 +1,18 @@
+.nameSearched {
+    color: #f50;
+}
+
+.synonymSearched {
+    color: rgb(24,144,255);
+}
+
+.changeParentFrom{
+    color:rgb(24,144,255);
+    font-size: 1.2em;
+    font-weight: bold;
+}
+.changeParentTo{
+    color:#f50;
+    font-size: 1.2em;
+    font-weight: bold;
+}

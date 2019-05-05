@@ -12,7 +12,8 @@
     "react": "^16.8.6",
     "react-app-rewired": "^2.1.1",
     "react-dom": "^16.8.6",
-    "react-scripts": "2.1.8"
+    "react-scripts": "2.1.8",
+    "reqwest": "^2.0.5"
   },
   "scripts": {
     "start": "react-app-rewired start",
@@ -22,7 +23,7 @@
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject"
   },
-  "homepage": "./",
+  "homepage": "/backend/static/build",
   "eslintConfig": {
     "extends": "react-app"
   },

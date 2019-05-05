@@ -1,15 +1,8 @@
 import React, {Component} from 'react';
 import {Entity, getAttributeNode, getFoodNode, getSynonymNames, ID, Name, Path} from "../lib/getData";
-import {Divider, Table} from "antd";
-import {DeleteMappingModal} from "./deleteMappingModal";
+import {Table} from "antd";
 
 export class StandardFoodDetail extends Component {
-    modifyMapping = (generalID, field, attributeIDs) => {
-        this.props.setStandardFoodID(this.props.id);
-        this.props.setGeneralFoodID(generalID);
-        this.props.setStandardAttributeIDs(attributeIDs);
-        return false;
-    };
     entityTable = (item) => {
         const entityDict = item[Entity];
         let entityData = [];
@@ -45,16 +38,6 @@ export class StandardFoodDetail extends Component {
             title: '实体路径',
             dataIndex: 'path',
             key: 'path'
-        }, {
-            title: '操作',
-            key: 'action',
-            render: (text, record) => (
-                <span>
-                    <DeleteMappingModal generalID={record.key} field={record.field} standardID={item[ID]}/>
-                    <Divider type='vertical'/>
-                    <a href="#" onClick={() => this.modifyMapping(record.key, record.field, record.attributeIDs)}>修改</a>
-                </span>
-            )
         }];
         return <Table columns={columns} dataSource={entityData}/>
     };
