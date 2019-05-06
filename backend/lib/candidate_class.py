@@ -226,16 +226,30 @@ class CANDIDATE(object):
 
         # 节点相似度排序
         similary_node_inorder = {}
+        ids = []
+        ids0 = dict()
+        ids1 = dict()
+        idOthers = dict()
         for key, value in similarities.items():
+            if int(value) == 0:
+                ids0[key] = self.general_foods[field][key]
+            elif int(value) == 1:
+                ids1[key] = self.general_foods[field][key]
+            else:
+                idOthers[key] = value
+        ids.extend(self.getIDSByTopology(field, ids0))
+        ids.extend(self.getIDSByTopology(field, ids1))
+
+        for key, value in idOthers.items():
             min = 100
             min_k = -1
-            for k, v in similarities.items():
+            for k, v in idOthers.items():
                 if min > int(v) and (k not in similary_node_inorder.keys()):
                     min = int(v)
                     min_k = k
             similary_node_inorder[min_k] = self.general_foods[field][min_k]
 
-        ids = self.getIDSByTopology(field, similary_node_inorder)
+        ids.extend(self.getIDSByTopology(field, similary_node_inorder))
         return ids
 
     def getParentAttri(self, field, general_id):
