@@ -18,9 +18,9 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "prebuild": "(IF EXIST ..\\backend\\templates\\index.html (DEL ..\\backend\\templates\\index.html)) && (IF EXIST ..\\backend\\static\\build RD /s /q ..\\backend\\static\\build)",
+    "prebuild": "rm -rf ../backend/templates/index.html && rm -rf ../backend/static/build",
     "build": "react-app-rewired build",
-    "postbuild": "move build\\index.html ..\\backend\\templates\\ &&  move build ..\\backend\\static\\",
+    "postbuild": "mv build/index.html ../backend/templates/ &&  mv build ../backend/static/",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject"
   },

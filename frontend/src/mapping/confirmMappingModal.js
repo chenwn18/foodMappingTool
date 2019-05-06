@@ -42,20 +42,20 @@ export class ConfirmMappingModal extends Component {
             return '';
         if (!attributeName)
             return (<div>
-                <p>将{generalFood[Field]}领域的<span>{generalFood[Path]}</span>映射为：</p>
-                <p>标准食品<span>{standardFood[Path]}</span>？</p>
+                <p>将{generalFood[Field]}领域的<span className='emphasize1'>{generalFood[Path]}</span>映射为：</p>
+                <p>标准食品<span className='emphasize2'>{standardFood[Path]}</span>？</p>
             </div>);
         else if (!standardFood)
             return (<div>
-                <p>将{generalFood[Field]}领域的<span>{generalFood[Path]}</span>映射为：</p>
-                <p>标准属性<span>{attributeName}</span>？</p>
+                <p>将{generalFood[Field]}领域的<span className='emphasize1'>{generalFood[Path]}</span>映射为：</p>
+                <p>标准属性<span className='emphasize2'>{attributeName}</span>？</p>
             </div>);
         else
             return (<div>
-                <p>将{generalFood[Field]}领域的<span>{generalFood[Path]}</span>映射为：</p>
-                <p>标准食品<span>{standardFood[Path]}</span></p>
+                <p>将{generalFood[Field]}领域的<span className='emphasize1'>{generalFood[Path]}</span>映射为：</p>
+                <p>标准食品<span className='emphasize2'>{standardFood[Path]}</span></p>
                 <p>+</p>
-                <p>属性<span>{attributeName}</span>？</p>
+                <p>属性<span className='emphasize2'>{attributeName}</span>？</p>
             </div>);
 
     };
@@ -72,7 +72,7 @@ export class ConfirmMappingModal extends Component {
                 </Button>
                 <Modal
                     visible={visible}
-                    title="映射确认"
+                    title={<span className='modalTitle'>映射确认</span>}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                     footer={[

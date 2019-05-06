@@ -1,18 +1,19 @@
 import React, {Component} from 'react'
-import {Button, Modal, Form, Input,message} from 'antd';
+import {Button, Modal, Form, Input, message} from 'antd';
 
 const CollectionCreateForm = Form.create({name: 'form_in_modal'})(
     // eslint-disable-next-line
     class extends React.Component {
         render() {
             const {
-                visible,loading, onCancel, onCreate, form
+                visible, loading, onCancel, onCreate, form
             } = this.props;
             const {getFieldDecorator} = form;
             return (
                 <Modal
                     visible={visible}
-                    title="创建新结点"
+                    centered
+                    title={<span className='modalTitle'>创建新结点</span>}
                     footer={[
                         <Button key="back" onClick={onCancel}>取消</Button>,
                         <Button key="submit" type="primary" loading={loading} onClick={onCreate}>
@@ -58,10 +59,8 @@ export class AddStandardNode extends Component {
                 return;
             }
             this.setState({loading: true});
-            console.log('Received values of form: ', values);
-            console.log(this.props.id);
             this.props.addNode(this.props.id, values.name, values.note, (response) => {
-                if(response==='success')
+                if (response === 'success')
                     message.info('success');
                 else
                     message.error(response);

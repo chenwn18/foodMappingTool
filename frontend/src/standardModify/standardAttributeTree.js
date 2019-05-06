@@ -12,6 +12,7 @@ import {AddStandardNode} from "./addStandardNode";
 import {addStandardAttribute, changeAttributeParent, modifyAttributeInfo} from "../lib/postData";
 import {DeleteStandardAttributeModal} from "./deleteStandardAttributeModal";
 import {ModifyInfoModal} from "./modifyInfoModal";
+import {OperationHistoryModal} from "../mapping/operationHistoryModal";
 
 
 const {TreeNode} = Tree;
@@ -24,6 +25,7 @@ class RightClickMenuWrapper extends Component {
                 <Menu.Item key="0"><ModifyInfoModal id={this.props.id} modifyInfo={modifyAttributeInfo}/></Menu.Item>
                 <Menu.Item key="1"><AddStandardNode id={this.props.id} addNode={addStandardAttribute}/></Menu.Item>
                 <Menu.Item key="2"><DeleteStandardAttributeModal id={this.props.id}/></Menu.Item>
+                <Menu.Item key="3"><OperationHistoryModal id={this.props.id} type="attribute"/></Menu.Item>
             </Menu>
         );
         return (
@@ -148,10 +150,12 @@ export class StandardAttributeTree extends Component {
                 </Tree>
                 <Modal
                     visible={this.state.changeParentModalVisible}
-                    title="父节点变更确认"
+                    centered
+                    title={<span className='modalTitle'>父节点变更确认</span>}
                     footer={[
                         <Button key="back" onClick={this.handleChangeParentModalCancel}>取消</Button>,
-                        <Button key="submit" type="primary" loading={this.state.changeParentModalLoading} onClick={this.handleChangeParentModalOK}>
+                        <Button key="submit" type="danger" loading={this.state.changeParentModalLoading}
+                                onClick={this.handleChangeParentModalOK}>
                             确认变更
                         </Button>,
                     ]}
@@ -159,13 +163,13 @@ export class StandardAttributeTree extends Component {
                     <p>
                         确认将
                         <span
-                            className='changeParentFrom'>{getAttributeNode(this.state.currentID || '属性0')[Name]}</span>
+                            className='emphasize1'>{getAttributeNode(this.state.currentID || '属性0')[Name]}</span>
                         的父节点从
                         <span
-                            className='changeParentFrom'>{getAttributeNode(getParentAttributeID(this.state.currentID || '属性1'))[Path]}</span>
+                            className='emphasize2'>{getAttributeNode(getParentAttributeID(this.state.currentID || '属性1'))[Path]}</span>
                         变更为
                         <span
-                            className='changeParentTo'>{getAttributeNode(this.state.newParentID || '属性1')[Path]} </span>
+                            className='emphasize1'>{getAttributeNode(this.state.newParentID || '属性1')[Path]} </span>
                         吗？
                     </p>
                 </Modal>

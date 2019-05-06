@@ -55,24 +55,24 @@ def modify_standard_food_info(id, name, note):
     return all_data.modify_standard_food_info(id, name, note)
 
 
-@main.route('/modifyStandardAttributeInfo/<id>/<name>/<note>', methods=['POST'])
-def modify_standard_attribute_info(id, name, note):
-    return all_data.modify_standard_attribute_info(id, name, note)
+@main.route('/modifyStandardAttributeInfo/<attribute_id>/<name>/<note>', methods=['POST'])
+def modify_standard_attribute_info(attribute_id, name, note):
+    return all_data.modify_standard_attribute_info(attribute_id, name, note)
 
 
-@main.route('/deleteStandardFood/<id>', methods=['POST'])
-def delete_standard_food(id):
-    res = all_data.delete_standard_food(id)
-    if res == id:
+@main.route('/deleteStandardFood/<food_id>', methods=['POST'])
+def delete_standard_food(food_id):
+    res = all_data.delete_standard_food(food_id)
+    if res == food_id:
         return 'success'
     else:
         return res
 
 
-@main.route('/deleteStandardAttribute/<id>', methods=['POST'])
-def delete_standard_attribute(id):
-    res = all_data.delete_standard_attribute(id)
-    if res == id:
+@main.route('/deleteStandardAttribute/<attribute_id>', methods=['POST'])
+def delete_standard_attribute(attribute_id):
+    res = all_data.delete_standard_attribute(attribute_id)
+    if res == attribute_id:
         return 'success'
     else:
         return res
@@ -90,22 +90,21 @@ def add_standard_food(parent_id, name, note):
 @main.route('/addStandardAttribute/<parent_id>/<name>/<note>', methods=['POST'])
 def add_standard_attribute(parent_id, name, note):
     res: str = all_data.insert_standard_attribute(parent_id, name, note)
+    print(res)
     if res.startswith('属性'):
         return 'success'
     else:
         return res
 
 
-@main.route('/changeStandardFoodParent/<id>/<new_parent_id>', methods=['POST'])
-def change_standard_food_parent(id, new_parent_id):
-    pass
-    return 'success'
+@main.route('/changeStandardFoodParent/<food_id>/<new_parent_id>', methods=['POST'])
+def change_standard_food_parent(food_id, new_parent_id):
+    return all_data.modify_standard_food_parent(food_id, new_parent_id)
 
 
-@main.route('/changeAttributeParent/<id>/<new_parent_id>', methods=['POST'])
-def change_attribute_parent(id, new_parent_id):
-    pass
-    return 'success'
+@main.route('/changeAttributeParent/<attribute_id>/<new_parent_id>', methods=['POST'])
+def change_attribute_parent(attribute_id, new_parent_id):
+    return all_data.modify_standard_attribute_parent(attribute_id, new_parent_id)
 
 
 @main.route('/getCandidate/<field>/<general_id>', methods=['GET'])
