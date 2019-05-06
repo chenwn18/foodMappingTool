@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Modal, Button, Table} from 'antd';
+import {Modal, Button, Table, message} from 'antd';
 import {deleteStandardAttribute} from "../lib/postData";
 import {
     Entity,
@@ -26,10 +26,13 @@ export class DeleteStandardAttributeModal extends Component {
 
     handleOk = () => {
         this.setState({loading: true});
-        deleteStandardAttribute(this.props.id);
-        setTimeout(() => {
+        deleteStandardAttribute(this.props.id, (response) => {
+            if (response === 'success')
+                message.info('success');
+            else
+                message.error(response)
             this.setState({loading: false, visible: false});
-        }, 2000);
+        });
     };
     modalInfo = () => {
         let ids = getAttributeChildrenIDs(this.props.id);

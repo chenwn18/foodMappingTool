@@ -11,7 +11,7 @@ import {
 import {AddStandardNode} from "./addStandardNode";
 import {addStandardAttribute, changeAttributeParent, modifyAttributeInfo} from "../lib/postData";
 import {DeleteStandardAttributeModal} from "./deleteStandardAttributeModal";
-import {ModifyInfoModal} from "./modifyInofModal";
+import {ModifyInfoModal} from "./modifyInfoModal";
 
 
 const {TreeNode} = Tree;

@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Button, Modal, Form, Input} from 'antd';
+import {Button, Modal, Form, Input,message} from 'antd';
 
 const CollectionCreateForm = Form.create({name: 'form_in_modal'})(
     // eslint-disable-next-line
@@ -60,12 +60,14 @@ export class AddStandardNode extends Component {
             this.setState({loading: true});
             console.log('Received values of form: ', values);
             console.log(this.props.id);
-            this.props.addNode(this.props.id,values.name,values.note);
-
-            form.resetFields();
-            setTimeout(() => {
+            this.props.addNode(this.props.id, values.name, values.note, (response) => {
+                if(response==='success')
+                    message.info('success');
+                else
+                    message.error(response);
+                form.resetFields();
                 this.setState({loading: false, visible: false});
-            }, 2000);
+            });
         });
     };
 

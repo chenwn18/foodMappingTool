@@ -1,4 +1,5 @@
 import reqwest from 'reqwest'
+import {updateGeneralFoods, updateStandardAttributes, updateStandardFoods} from "./getData";
 
 function postData(url, data, callback) {
     reqwest({
@@ -15,43 +16,84 @@ export function addMapping(field, generalID, standardID, standardAttributeIDs, c
         generalID: generalID,
         standardID: standardID,
         standardAttributeIDs: standardAttributeIDs
-    }, callback);
+    }, (resp) => {
+        updateGeneralFoods();
+        updateStandardFoods();
+        callback(resp);
+    });
 }
 
 export function deleteMapping(generalID, standardID, field, callback) {
-    postData('/deleteMapping/' + field + '/' + generalID + '/' + standardID, [], callback);
+    const url = '/deleteMapping/' + field + '/' + generalID + '/' + standardID;
+    postData(url, [], (resp) => {
+        updateGeneralFoods();
+        updateStandardFoods();
+        callback(resp);
+    });
 }
 
-export function deleteStandardFood(standardID) {
-    console.log('deleteStandardFood: ' + standardID);
+export function deleteStandardFood(standardID, callback) {
+    const url = 'deleteStandardFood/' + standardID;
+    postData(url, [], (resp) => {
+        updateGeneralFoods();
+        updateStandardFoods();
+        callback(resp);
+    });
 }
 
-export function deleteStandardAttribute(attributeID) {
-    console.log('deleteStandardAttribute: ' + attributeID);
+export function deleteStandardAttribute(attributeID, callback) {
+    const url = 'deleteStandardAttribute/' + attributeID;
+    postData(url, [], (resp) => {
+        updateStandardAttributes();
+        updateStandardFoods();
+        callback(resp);
+    });
 }
 
-export function addStandardFood(parentID, name, note) {
-    console.log('addStandardFood: ' + parentID + ' ' + name + ' ' + (note || ''));
+export function addStandardFood(parentID, name, note, callback) {
+    const url = 'addStandardFood/' + parentID + '/' + name + '/' + note;
+    postData(url, [], (resp) => {
+        updateStandardFoods();
+        callback(resp);
+    });
 }
 
-export function addStandardAttribute(parentID, name, note) {
-    console.log('addStandardAttribute: ' + parentID + ' ' + name + ' ' + (note || ''));
+export function addStandardAttribute(parentID, name, note,callback) {
+    const url = 'addStandardAttribute/' + parentID + '/' + name + '/' + note;
+    postData(url, [], (resp) => {
+        updateStandardAttributes();
+        callback(resp);
+    });
 }
 
-export function changeFoodParent(id, newParentID, field = null) {
-    console.log('changeParent: ' + id + ' ' + newParentID);
+export function changeStandardFoodParent(id, newParentID, callback) {
+    const url = '/changeStandardFoodParent/' + id + '/' + newParentID;
+    postData(url, [], (resp) => {
+        updateStandardFoods();
+        callback(resp);
+    });
 }
 
-export function changeAttributeParent(id, newParentID) {
-    console.log('changeAttributeParent: ' + id + ' ' + newParentID);
+export function changeAttributeParent(id, newParentID, callback) {
+    const url = '/changeAttributeParent/' + id + '/' + newParentID;
+    postData(url, [], (resp) => {
+        updateStandardAttributes();
+        callback(resp);
+    });
 }
 
 export function modifyAttributeInfo(id, name, note, callback) {
     const url = '/modifyStandardAttributeInfo/' + id + '/' + name + '/' + note;
-    postData(url, [], callback);
+    postData(url, [], (resp) => {
+        updateStandardAttributes();
+        callback(resp);
+    });
 }
 
 export function modifyStandardFoodInfo(id, name, note, callback) {
     const url = '/modifyStandardFoodInfo/' + id + '/' + name + '/' + note;
-    postData(url, [], callback);
+    postData(url, [], (resp) => {
+        updateStandardFoods();
+        callback(resp);
+    });
 }

@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Modal, Button, Table} from 'antd';
+import {Modal, Button, Table,message} from 'antd';
 import {deleteStandardFood} from "../lib/postData";
 import {Entity, getAttributeNode, getFoodChildrenIDs, getFoodNode, getOntologyNodes, Name, Path} from "../lib/getData";
 
@@ -17,10 +17,14 @@ export class DeleteStandardFoodModal extends Component {
 
     handleOk = () => {
         this.setState({loading: true});
-        deleteStandardFood(this.props.id);
-        setTimeout(() => {
+        deleteStandardFood(this.props.id,(response)=>
+         {
+             if(response==='success')
+                 message.info('success');
+             else
+                 message.error(response);
             this.setState({loading: false, visible: false});
-        }, 2000);
+        });
     };
     modalInfo = () => {
         let ids = getFoodChildrenIDs(this.props.id);

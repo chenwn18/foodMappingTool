@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Tree, Input, Popover, Menu, Dropdown, Button, Modal} from 'antd'
+import {Tree, Input, Popover, Menu, Dropdown, Button, Modal, message} from 'antd'
 import {
     goThroughFoodNodes,
     getParentFoodID,
@@ -13,8 +13,8 @@ import {
 import {DeleteStandardFoodModal} from "./deleteStandardFoodModal";
 import {StandardFoodDetail} from "./standardFoodDetail";
 import {AddStandardNode} from "./addStandardNode";
-import {addStandardFood, changeFoodParent, modifyStandardFoodInfo} from "../lib/postData";
-import {ModifyInfoModal} from "./modifyInofModal";
+import {addStandardFood, changeStandardFoodParent, modifyStandardFoodInfo} from "../lib/postData";
+import {ModifyInfoModal} from "./modifyInfoModal";
 
 const {TreeNode} = Tree;
 const Search = Input.Search;
@@ -49,13 +49,16 @@ export class StandardFoodTree extends Component {
     };
     handleChangeParentModalOK = () => {
         this.setState({changeParentModalLoading: true});
-        changeFoodParent(this.state.currentID, this.state.newParentID);
-        setTimeout(() => {
+        changeStandardFoodParent(this.state.currentID, this.state.newParentID, (response) => {
+            if (response === 'success')
+                message.info(response);
+            else
+                message.error(response)
             this.setState({
                 changeParentModalLoading: false,
                 changeParentModalVisible: false
             });
-        }, 2000);
+        });
     };
     handleChangeParentModalCancel = () => {
         this.setState({changeParentModalVisible: false});

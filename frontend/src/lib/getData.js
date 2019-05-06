@@ -1,12 +1,20 @@
-import generalFoods from '../testData/general_foods';
-import standardFoods from '../testData/standard_foods';
-import standardAttributes from '../testData/standard_attributes';
+// import generalFoods from '../testData/general_foods';
+// import standardFoods from '../testData/standard_foods';
+// import standardAttributes from '../testData/standard_attributes';
 import {arrayToDict, findRootNodeID, makeTree} from "./toolFunction";
 import reqwest from "reqwest";
 
-const standardFoodsDict = getStandardFoods();
-const standardAttributesDict = getStandardAttributes();
-const generalFoodsDict = getGeneralFoods();
+let standardFoodsDict;
+getStandardFoods();
+let standardAttributesDict;
+getStandardAttributes();
+let generalFoodsDict;
+getGeneralFoods();
+
+export let loadedFlag = false;
+let standardFoodLoaded = false;
+let standardAttributeLoaded = false;
+let generalFoodLoaded = false;
 
 export const ID = 'id';
 export const ParentID = 'parent_id';
@@ -16,6 +24,42 @@ export const Synonyms = 'synonyms';
 export const Path = 'path';
 export const Field = 'field';
 export const Entity = 'entity';
+
+function updateLoadedFlag() {
+    loadedFlag = standardFoodLoaded && standardAttributeLoaded && generalFoodLoaded;
+    console.log('loaded: ' + loadedFlag);
+    return loadedFlag;
+}
+
+export function changeStandardFoodLoaded(loaded = false) {
+    standardFoodLoaded = loaded;
+    updateLoadedFlag();
+}
+
+export function changeStandardAttributeLoaded(loaded = false) {
+    standardAttributeLoaded = loaded;
+    updateLoadedFlag();
+}
+
+export function changeGeneralFoodLoaded(loaded = false) {
+    generalFoodLoaded = loaded;
+    updateLoadedFlag();
+}
+
+export function updateStandardFoods(response) {
+    if (response === 'success')
+        getStandardFoods();
+}
+
+export function updateStandardAttributes(response) {
+    if (response === 'success')
+        getStandardAttributes();
+}
+
+export function updateGeneralFoods(response) {
+    if (response === 'success')
+        getGeneralFoods();
+}
 
 //ToDo: check parameters!
 export function getParentFoodID(nodeID, field = null) {
@@ -100,28 +144,38 @@ export function goThroughAttributeNodes(callback) {
 }
 
 function getStandardFoods() {
-    return arrayToDict(standardFoods);
+    changeStandardFoodLoaded(false);
+    const url = '/getStandardFoods';
+    getData(url, res => {
+        console.log('food! ' + res);
+        standardFoodLoaded = true;
+        standardFoodsDict = arrayToDict(res);
+        changeStandardFoodLoaded(true);
+    });
 }
 
 function getStandardAttributes() {
-    return arrayToDict(standardAttributes);
+    changeStandardAttributeLoaded(false);
+    const url = '/getStandardAttributes';
+    getData(url, res => {
+        console.log('att! ' + res);
+        standardAttributesDict = arrayToDict(res);
+        changeStandardAttributeLoaded(true);
+    });
 }
-
 
 function getGeneralFoods() {
-    let generals = {};
-    for (let field in generalFoods)
-        generals[field] = arrayToDict(generalFoods[field]);
-    return generals;
+    changeGeneralFoodLoaded(false);
+    const url = '/getGeneralFoods';
+    getData(url, res => {
+        console.log('general! ' + res);
+        generalFoodsDict = {};
+        for (let field in res)
+            generalFoodsDict[field] = arrayToDict(res[field]);
+        changeGeneralFoodLoaded(true);
+    });
 }
 
-// export function getStandardFoodTree() {
-//     let idNodeDict = getStandardFoods();
-//     let rootID = findRootNodeID(idNodeDict);
-//     return makeTree(rootID, idNodeDict);
-// }
-//
-//
 export function getGeneralFoodTree() {
     let idNodeDict = getGeneralFoods();
     let result = {};
@@ -143,14 +197,6 @@ export function getCandidate(generalID, field, callback) {
     getData(url, (res) => {
         callback(res.candidateFoods, res.candidateAttributes);
     })
-}
-
-export function getCandidateFoodIDs(generalID, field) {
-    return ['食品2', '食品3', '食品4'];
-}
-
-export function getCandidateAttributeIDs(generalID, field) {
-    return ['属性2', '属性3', '属性4'];
 }
 
 function getData(url, callback) {
