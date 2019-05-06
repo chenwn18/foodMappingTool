@@ -1,11 +1,6 @@
-.searchTree {
-    font-size: 1em;
-}
-
-.searchBar {
-    width: 500px;
-    height: 40px;
-    margin: 0 8px 8px 0;
+.title {
+    font-size: 1.5em;
+    font-weight: bolder;
 }
 
 .candidateName {
@@ -14,7 +9,8 @@
 
 .candidatePath {
     float: right;
-    color: rgba(0, 0, 0, 0.65)
+    opacity: 0.25;
+    /*color: rgba(0, 0, 0, 0.25)*/
 }
 
 .emphasize1 {
@@ -29,7 +25,66 @@
     font-weight: bold;
 }
 
-header {
+.unmapped {
+    background-color: rgba(24, 144, 255, 0.5);
+}
+
+.mappingBox {
+    -moz-transition: all 0.5s ease-in;
+    -o-transition: all 0.5s ease-in;
+    -webkit-transition: all 0.5s ease-in;
+    transition: all 0.5s ease-in;
+    /*color: black;*/
+    padding: 20px;
+}
+
+.mappingBox header {
+    text-align: center;
+}
+
+.mappingBox h3 {
+    font-size: 1.2em;
+    margin-top: 20px;
+    text-align: center;
+    font-weight: bolder;
+
+}
+
+.mappingBox button {
+    display: block;
+    margin: 20px auto;
+}
+
+.highlight {
+    background-color: rgba(24, 144, 255, 0.5);
+}
+
+#selectField h3 {
+    font-size: 1.2em;
+    margin-right: 20px;
+    display: inline-block;
+}
+
+#selectField .select {
+    display: inline-block;
+}
+
+.selectTrees {
+    position: relative;
+}
+
+.selectTrees .select {
+    display: block;
+    margin: 0 auto;
+}
+
+.introduction p {
+    text-align: center;
+    margin: 0 auto;
+    color: rgb(24, 144, 255);
+}
+
+#mapping header {
     text-align: center;
     font-weight: bold;
 }

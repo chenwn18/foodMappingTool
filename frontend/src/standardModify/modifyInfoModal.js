@@ -1,18 +1,19 @@
 import React, {Component} from 'react'
-import {Button, Modal, Form, Input,message} from 'antd';
+import {Button, Modal, Form, Input, message} from 'antd';
 
 const CollectionCreateForm = Form.create({name: 'form_in_modal'})(
     // eslint-disable-next-line
     class extends React.Component {
         render() {
             const {
-                visible,loading, onCancel, onCreate, form
+                visible, loading, onCancel, onCreate, form
             } = this.props;
             const {getFieldDecorator} = form;
             return (
                 <Modal
                     visible={visible}
-                    title="变更结点信息"
+                    centered
+                    title={<span className='modalTitle'>变更结点信息</span>}
                     footer={[
                         <Button key="back" onClick={onCancel}>取消</Button>,
                         <Button key="submit" type="primary" loading={loading} onClick={onCreate}>
@@ -58,8 +59,8 @@ export class ModifyInfoModal extends Component {
                 return;
             }
             this.setState({loading: true});
-            this.props.modifyInfo(this.props.id,values.name,values.note,(response)=> {
-                if(response==='success')
+            this.props.modifyInfo(this.props.id, values.name, values.note, (response) => {
+                if (response === 'success')
                     message.info('success');
                 else
                     message.error(response);

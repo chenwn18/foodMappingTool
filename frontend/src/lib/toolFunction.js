@@ -48,3 +48,14 @@ export function getNodePath(currentID, nodesDict, root_id = null, ParentID = 'pa
     path.reverse();
     return path.join('→');
 }
+
+export function parseHistory(record) {
+    let s1 = record.description;
+    let s2 = s1.replace(/\(id:\[[^\]]*]\)/, '');
+    while (s2 !== s1) {
+        s1 = s2;
+        s2 = s1.replace(/\(id:\[[^\]]*]\)/, '');
+    }
+    const res = s2.split(' - ');
+    return {time: res[0], operation: res[1]};
+}

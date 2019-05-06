@@ -2,13 +2,18 @@ import React, {Component} from 'react';
 import {Entity, getAttributeNode, getFoodNode, getSynonymNames, ID, Name, Path} from "../lib/getData";
 import {Divider, Table} from "antd";
 import {DeleteMappingModal} from "./deleteMappingModal";
+import {OperationHistoryModal} from "./operationHistoryModal";
 
 export class StandardFoodDetail extends Component {
     modifyMapping = (generalID, field, attributeIDs) => {
+        this.props.setField(field);
         this.props.setStandardFoodID(this.props.id);
         this.props.setGeneralFoodID(generalID);
         this.props.setStandardAttributeIDs(attributeIDs);
-        return false;
+        this.props.setMappingBoxHighlight(true);
+        setTimeout(() => {
+            this.props.setMappingBoxHighlight(false)
+        }, 2000);
     };
     entityTable = (item) => {
         const entityDict = item[Entity];
@@ -23,7 +28,7 @@ export class StandardFoodDetail extends Component {
                     name: foodNode[Name],
                     attribute: attributeIDs.map(attributeID => getAttributeNode(attributeID)[Name]).join('|'),
                     attributeIDs: attributeIDs,
-                    path: foodNode[Path]
+                    path: <a href="#" onClick={() => this.props.setGeneralFoodID(foodNode[ID])}>{foodNode[Path]}</a>
                 })
             }
         }
@@ -79,6 +84,7 @@ export class StandardFoodDetail extends Component {
             <div>
                 <p>别称：{synonyms}</p>
                 <p>路径：{item[Path]}</p>
+                <OperationHistoryModal id={this.props.id}/>
                 {this.entityTable(item)}
             </div>
         )

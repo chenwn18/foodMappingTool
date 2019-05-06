@@ -1,0 +1,9 @@
+#login {
+    text-align: center;
+    display: block;
+    margin: 200px auto;
+}
+
+#login input {
+    margin-bottom: 30px;
+}

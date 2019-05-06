@@ -15,6 +15,7 @@ import {StandardFoodDetail} from "./standardFoodDetail";
 import {AddStandardNode} from "./addStandardNode";
 import {addStandardFood, changeStandardFoodParent, modifyStandardFoodInfo} from "../lib/postData";
 import {ModifyInfoModal} from "./modifyInfoModal";
+import {OperationHistoryModal} from "../mapping/operationHistoryModal";
 
 const {TreeNode} = Tree;
 const Search = Input.Search;
@@ -26,6 +27,7 @@ class RightClickMenuWrapper extends Component {
                 <Menu.Item key="0"><ModifyInfoModal id={this.props.id} modifyInfo={modifyStandardFoodInfo}/></Menu.Item>
                 <Menu.Item key="1"><DeleteStandardFoodModal id={this.props.id}/></Menu.Item>
                 <Menu.Item key="2"><AddStandardNode id={this.props.id} addNode={addStandardFood}/></Menu.Item>
+                <Menu.Item key="3"><OperationHistoryModal id={this.props.id}/></Menu.Item>
                 {/*<Menu.Item key="3"><a href="#" onClick={() => this.props.changeParent()}>变更父节点</a></Menu.Item>*/}
             </Menu>
         );
@@ -166,10 +168,11 @@ export class StandardFoodTree extends Component {
                 </Tree>
                 <Modal
                     visible={this.state.changeParentModalVisible}
-                    title="父节点变更确认"
+                    centered
+                    title={<span className='modalTitle'>父节点变更确认</span>}
                     footer={[
                         <Button key="back" onClick={this.handleChangeParentModalCancel}>取消</Button>,
-                        <Button key="submit" type="primary" loading={this.state.changeParentModalLoading}
+                        <Button key="submit" type="danger" loading={this.state.changeParentModalLoading}
                                 onClick={this.handleChangeParentModalOK}>
                             确认变更
                         </Button>,
@@ -178,13 +181,13 @@ export class StandardFoodTree extends Component {
                     <p>
                         确认将
                         <span
-                            className='changeParentFrom'>{getFoodNode(this.state.currentID || '食品1')[Name]}</span>
+                            className='emphasize1'>{getFoodNode(this.state.currentID || '食品1')[Name]}</span>
                         的父节点从
                         <span
-                            className='changeParentFrom'>{getFoodNode(getParentFoodID(this.state.currentID || '食品1'))[Path]}</span>
+                            className='emphasize2'>{getFoodNode(getParentFoodID(this.state.currentID || '食品1'))[Path]}</span>
                         变更为
                         <span
-                            className='changeParentTo'>{getFoodNode(this.state.newParentID || '食品1')[Path]} </span>
+                            className='emphasize1'>{getFoodNode(this.state.newParentID || '食品1')[Path]} </span>
                         吗？
                     </p>
                 </Modal>

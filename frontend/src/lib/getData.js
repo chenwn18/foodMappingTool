@@ -1,7 +1,7 @@
 // import generalFoods from '../testData/general_foods';
 // import standardFoods from '../testData/standard_foods';
 // import standardAttributes from '../testData/standard_attributes';
-import {arrayToDict, findRootNodeID, makeTree} from "./toolFunction";
+import {arrayToDict, findRootNodeID, makeTree, parseHistory} from "./toolFunction";
 import reqwest from "reqwest";
 
 let standardFoodsDict;
@@ -27,8 +27,9 @@ export const Entity = 'entity';
 
 function updateLoadedFlag() {
     loadedFlag = standardFoodLoaded && standardAttributeLoaded && generalFoodLoaded;
-    console.log('loaded: ' + loadedFlag);
-    return loadedFlag;
+    if (!window.reactRootNode)
+        return;
+    window.reactRootNode.changeLoadedFlag(loadedFlag);
 }
 
 export function changeStandardFoodLoaded(loaded = false) {
@@ -147,7 +148,6 @@ function getStandardFoods() {
     changeStandardFoodLoaded(false);
     const url = '/getStandardFoods';
     getData(url, res => {
-        console.log('food! ' + res);
         standardFoodLoaded = true;
         standardFoodsDict = arrayToDict(res);
         changeStandardFoodLoaded(true);
@@ -158,7 +158,6 @@ function getStandardAttributes() {
     changeStandardAttributeLoaded(false);
     const url = '/getStandardAttributes';
     getData(url, res => {
-        console.log('att! ' + res);
         standardAttributesDict = arrayToDict(res);
         changeStandardAttributeLoaded(true);
     });
@@ -168,7 +167,6 @@ function getGeneralFoods() {
     changeGeneralFoodLoaded(false);
     const url = '/getGeneralFoods';
     getData(url, res => {
-        console.log('general! ' + res);
         generalFoodsDict = {};
         for (let field in res)
             generalFoodsDict[field] = arrayToDict(res[field]);
@@ -177,7 +175,7 @@ function getGeneralFoods() {
 }
 
 export function getGeneralFoodTree() {
-    let idNodeDict = getGeneralFoods();
+    let idNodeDict = generalFoodsDict;
     let result = {};
     for (let field in idNodeDict) {
         let rootID = findRootNodeID(idNodeDict[field]);
@@ -187,16 +185,37 @@ export function getGeneralFoodTree() {
 }
 
 export function getStandardAttributeTree() {
-    let idNodeDict = getStandardAttributes();
-    let rootID = findRootNodeID(idNodeDict);
-    return makeTree(rootID, idNodeDict);
+    let rootID = findRootNodeID(standardAttributesDict);
+    return makeTree(rootID, standardAttributesDict);
 }
 
 export function getCandidate(generalID, field, callback) {
+    if (!generalID)
+        return;
     const url = '/getCandidate/' + field + '/' + generalID;
     getData(url, (res) => {
         callback(res.candidateFoods, res.candidateAttributes);
     })
+}
+
+export function getFields() {
+    return Object.keys(generalFoodsDict);
+}
+
+export function getFoodOperationRecord(foodID, field = null) {
+    const node = getFoodNode(foodID, field);
+    const history = node.history;
+    if (!history)
+        return [];
+    return history.map(parseHistory);
+}
+
+export function getAttributeOperationRecord(attributeID) {
+    const node = getAttributeNode(attributeID);
+    const history = node.history;
+    if (!history)
+        return [];
+    return history.map(parseHistory);
 }
 
 function getData(url, callback) {

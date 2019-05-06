@@ -1,6 +1,14 @@
 import React, {Component} from 'react'
 import {Tree, Input, Popover} from 'antd'
-import {goThroughFoodNodes, getParentFoodID, getRootFoodID, getFoodNode, getSynonymNames, ID, Name} from "../lib/getData";
+import {
+    goThroughFoodNodes,
+    getParentFoodID,
+    getRootFoodID,
+    getFoodNode,
+    getSynonymNames,
+    ID,
+    Name
+} from "../lib/getData";
 import './standardFoodTree.css'
 import {StandardFoodDetail} from "./standardFoodDetail";
 
@@ -47,6 +55,11 @@ export class StandardFoodTree extends Component {
             autoExpandParent: true,
         });
     };
+    onSelect = (selectedKeys) => {
+        if (!selectedKeys || selectedKeys.length === 0)
+            return;
+        this.props.setStandardFoodID(selectedKeys[0]);
+    };
 
     render() {
         const {searchValue, expandedKeys, autoExpandParent} = this.state;
@@ -76,7 +89,10 @@ export class StandardFoodTree extends Component {
                              content={<StandardFoodDetail id={item[ID]} searchValue={searchValue}
                                                           setStandardFoodID={this.props.setStandardFoodID.bind(this)}
                                                           setStandardAttributeIDs={this.props.setStandardAttributeIDs.bind(this)}
-                                                          setGeneralFoodID={this.props.setGeneralFoodID.bind(this)}/>}>
+                                                          setGeneralFoodID={this.props.setGeneralFoodID.bind(this)}
+                                                          setField={this.props.setField.bind(this)}
+                                                          setMappingBoxHighlight={this.props.setMappingBoxHighlight.bind(this)}
+                             />}>
                         {title}
                     </Popover>}>
                     {loop(item.children)}
@@ -91,6 +107,7 @@ export class StandardFoodTree extends Component {
                     onExpand={this.onExpand}
                     expandedKeys={expandedKeys}
                     autoExpandParent={autoExpandParent}
+                    onSelect={this.onSelect}
                 >
                     {loop([getRootFoodID()])}
                 </Tree>

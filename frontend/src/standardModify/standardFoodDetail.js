@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Entity, getAttributeNode, getFoodNode, getSynonymNames, ID, Name, Path} from "../lib/getData";
 import {Table} from "antd";
+import {OperationHistoryModal} from "../mapping/operationHistoryModal";
 
 export class StandardFoodDetail extends Component {
     entityTable = (item) => {
@@ -24,7 +25,7 @@ export class StandardFoodDetail extends Component {
             title: '领域',
             dataIndex: 'field',
             key: 'field',
-            render: text => <a href="javascript:">{text}</a>
+            render: text => <a href="#">{text}</a>
         }, {
             title: '实体名称',
             dataIndex: 'name',
@@ -33,7 +34,7 @@ export class StandardFoodDetail extends Component {
             title: '属性',
             dataIndex: 'attribute',
             key: 'attribute',
-            render: text => <a href="javascript:">{text}</a>
+            render: text => <a href="#">{text}</a>
         }, {
             title: '实体路径',
             dataIndex: 'path',
@@ -62,6 +63,7 @@ export class StandardFoodDetail extends Component {
             <div>
                 <p>别称：{synonyms}</p>
                 <p>路径：{item[Path]}</p>
+                <OperationHistoryModal id={this.props.id}/>
                 {this.entityTable(item)}
             </div>
         )
