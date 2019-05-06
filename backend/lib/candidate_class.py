@@ -135,9 +135,9 @@ class CANDIDATE(object):
         parent_id = self.field_node.parent_id
         for node in field_nodes_dict.values():
             if parent_id == node.id:
-                related_nodes.append(self.general_foods[field][field_code2sysid.get(node.code)])
+                related_nodes.append(self.general_foods[field][field_code2sysid.get(str(node.code))])
             if (parent_id == node.parent_id) and (node.id != self.field_node.id):
-                related_nodes.append(self.general_foods[field][field_code2sysid.get(node.code)])
+                related_nodes.append(self.general_foods[field][field_code2sysid.get(str(node.code))])
         return related_nodes
 
     def getdistance(self, field, snode, rnode):
@@ -181,12 +181,15 @@ class CANDIDATE(object):
                     total_distance = total_distance + self.getdistance(field, snode, rnode)
                 else:
                     dis_num = dis_num - 1
-            distances.append(total_distance/dis_num)
+            if dis_num != 0:
+                distances.append(total_distance / dis_num)
+            else:
+                distances.append(10000)
 
         temp_distances = distances.copy()
         while len(temp_distances) != 0:
             field_id = list(similary_node_inorder.keys())[distances.index(min(temp_distances))]
-            standard_id = self.general_foods['化学'][field_id].ontology
+            standard_id = self.general_foods[field][field_id].ontology
             if (len(standard_id) != 0) and (standard_id not in results):
                 results.append(standard_id)
             temp_distances.pop(temp_distances.index(min(temp_distances)))
@@ -198,7 +201,7 @@ class CANDIDATE(object):
         field_nodes_dict = self.allSysNodes.get(field)
         sysNodeName = ''
         for node in field_nodes_dict.values():
-            if sysCode == node.code:
+            if sysCode == str(node.code):
                 sysNodeName = node.name
                 self.field_node = node
                 break
@@ -248,7 +251,7 @@ class CANDIDATE(object):
         if parent_node == None:
             return attributs
         parent_nodes = []
-        node = self.general_foods[field][field_code2sysid.get(parent_node.code)]
+        node = self.general_foods[field][field_code2sysid.get(str(parent_node.code))]
         parent_nodes.append(node)
         while node.parent_id != "":
             node = self.general_foods[field][node.parent_id]
@@ -258,6 +261,7 @@ class CANDIDATE(object):
                 attr = self.standard_foods[pn.ontology[0]].entity[field][pn.id]
                 if len(attr) != 0:
                     attributs.extend(attr)
+        attributs = list(set(attributs))
         return attributs
 
     def getEqualNode(self, field, genreral_id):
