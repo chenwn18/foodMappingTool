@@ -1,0 +1,39 @@
+.nameSearched {
+    color: #f50;
+}
+
+.synonymSearched {
+    color: rgb(24, 144, 255);
+}
+
+.emphasize1 {
+    color: rgb(24, 144, 255);
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.emphasize2 {
+    color: #f50;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.warning {
+    color: #faad14;
+}
+
+.modalTitle {
+    font-size: 1.2em;
+    color: #f50;
+}
+
+.introduction p {
+    text-align: center;
+    margin: 0 auto;
+    color: rgb(24, 144, 255);
+}
+
+#standardModify header {
+    text-align: center;
+    font-weight: bold;
+}

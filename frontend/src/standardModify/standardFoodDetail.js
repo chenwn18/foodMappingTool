@@ -1,20 +1,9 @@
 import React, {Component} from 'react';
 import {Entity, getAttributeNode, getFoodNode, getSynonymNames, ID, Name, Path} from "../lib/getData";
-import {Divider, Table} from "antd";
-import {DeleteMappingModal} from "./deleteMappingModal";
-import {OperationHistoryModal} from "./operationHistoryModal";
+import {Table} from "antd";
+import {OperationHistoryModal} from "../mapping/operationHistoryModal";
 
 export class StandardFoodDetail extends Component {
-    modifyMapping = (generalID, field, attributeIDs) => {
-        this.props.setField(field);
-        this.props.setStandardFoodID(this.props.id);
-        this.props.setGeneralFoodID(generalID);
-        this.props.setStandardAttributeIDs(attributeIDs);
-        this.props.setMappingBoxHighlight(true);
-        setTimeout(() => {
-            this.props.setMappingBoxHighlight(false)
-        }, 2000);
-    };
     entityTable = (item) => {
         const entityDict = item[Entity];
         let entityData = [];
@@ -28,7 +17,7 @@ export class StandardFoodDetail extends Component {
                     name: foodNode[Name],
                     attribute: attributeIDs.map(attributeID => getAttributeNode(attributeID)[Name]).join('|'),
                     attributeIDs: attributeIDs,
-                    path: <a href="#" onClick={() => this.props.setGeneralFoodID(foodNode[ID])}>{foodNode[Path]}</a>
+                    path: foodNode[Path]
                 })
             }
         }
@@ -36,7 +25,7 @@ export class StandardFoodDetail extends Component {
             title: '领域',
             dataIndex: 'field',
             key: 'field',
-            render: text => <a href="javascript:">{text}</a>
+            render: text => <a href="#">{text}</a>
         }, {
             title: '实体名称',
             dataIndex: 'name',
@@ -45,21 +34,11 @@ export class StandardFoodDetail extends Component {
             title: '属性',
             dataIndex: 'attribute',
             key: 'attribute',
-            render: text => <a href="javascript:">{text}</a>
+            render: text => <a href="#">{text}</a>
         }, {
             title: '实体路径',
             dataIndex: 'path',
             key: 'path'
-        }, {
-            title: '操作',
-            key: 'action',
-            render: (text, record) => (
-                <span>
-                    <DeleteMappingModal generalID={record.key} field={record.field} standardID={item[ID]}/>
-                    <Divider type='vertical'/>
-                    <a href="#" onClick={() => this.modifyMapping(record.key, record.field, record.attributeIDs)}>修改</a>
-                </span>
-            )
         }];
         return <Table columns={columns} dataSource={entityData}/>
     };

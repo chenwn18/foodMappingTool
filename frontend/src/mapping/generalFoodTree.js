@@ -1,30 +1,22 @@
 import React, {Component} from 'react'
-import {Tree, Input, Popover, Table, Divider} from 'antd'
+import {Tree, Input, Popover, Row, Col, Divider} from 'antd'
 import {
-    goThroughNodes,
+    goThroughFoodNodes,
     getParentFoodID,
     getFoodNode,
     getOntologyNodes,
-    getAttributeNodes,
+    getRootFoodID,
     Name,
-    ID, Path, Ontology, getRootFoodID
+    ID,
+    Path,
+    Ontology
 } from "../lib/getData";
 import {GeneralFoodDetail} from "./generalFoodDetail";
-import './generalFoodTree.css'
+import Button from "antd/es/button";
 
 const {TreeNode} = Tree;
 const Search = Input.Search;
 
-// const standardFoodNodeDict = getStandardFoods();
-// const standardAttributesDict = getStandardAttributes();
-// const generalFoodNodeDict = getFieldFoods();
-// const ParentID = 'parent_id';
-// const Name = 'name';
-// const ID = 'id';
-// const Ontology = 'ontology';
-// const Path = 'path';
-// const Field = 'field';
-// const Entity = 'entity';
 
 export class GeneralFoodTree extends Component {
     state = {
@@ -65,7 +57,7 @@ export class GeneralFoodTree extends Component {
             });
             return;
         }
-        const expandedKeys = goThroughNodes((item) => {
+        const expandedKeys = goThroughFoodNodes((item) => {
             if (this.containQueryValue(item, value)) {
                 return getParentFoodID(item[ID], this.props.field);
             }
@@ -78,7 +70,18 @@ export class GeneralFoodTree extends Component {
         });
     };
     onSelect = (selectedKeys) => {
+        if (!selectedKeys || selectedKeys.length === 0)
+            return;
         this.props.setGeneralFoodID(selectedKeys[0]);
+    };
+    showUnmapped = () => {
+        const expandedKeys = goThroughFoodNodes((item) => {
+            if (item[Ontology].length > 0) {
+                return getParentFoodID(item[ID], this.props.field);
+            }
+            return null;
+        }, this.props.field).filter((item) => item);
+        this.setState({expandedKeys});
     };
 
     render() {
@@ -103,7 +106,11 @@ export class GeneralFoodTree extends Component {
             return (
                 <TreeNode key={item[ID]} title={
                     <Popover placement='right' title={item[Name]}
-                             content={<GeneralFoodDetail field={this.props.field} id={item[ID]}/>}>
+                             content={<GeneralFoodDetail field={this.props.field} id={item[ID]}
+                                                         setStandardFoodID={this.props.setStandardFoodID.bind(this)}
+                                                         setStandardAttributeIDs={this.props.setStandardAttributeIDs.bind(this)}
+                                                         setGeneralFoodID={this.props.setGeneralFoodID.bind(this)}
+                                                         setMappingBoxHighlight={this.props.setMappingBoxHighlight.bind(this)}/>}>
                         {title}
                     </Popover>}>
                     {loop(item.children)}
@@ -113,7 +120,14 @@ export class GeneralFoodTree extends Component {
 
         return (
             <div>
-                <Search style={{marginBottom: 8}} placeholder="Search" onChange={this.onChange}/>
+                <Row gutter={32}>
+                    <Col span={16}>
+                        <Search style={{marginBottom: 8}} placeholder="Search" onChange={this.onChange}/>
+                    </Col>
+                    <Col span={8}>
+                        <Button onClick={this.showUnmapped} type="primary">查看所有未映射结点</Button>
+                    </Col>
+                </Row>
                 <Tree
                     onExpand={this.onExpand}
                     expandedKeys={expandedKeys}

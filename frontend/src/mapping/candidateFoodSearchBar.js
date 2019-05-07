@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {Divider, Popover, Select} from 'antd';
-import {getFoodNode, getSynonymNames, goThroughNodes, ID, Name, Path} from "../lib/getData";
+import {getFoodNode, getSynonymNames, goThroughFoodNodes, ID, Name, Path} from "../lib/getData";
 import {StandardFoodDetail} from "./standardFoodDetail";
 import {deepCopy} from "../lib/toolFunction";
 
@@ -42,7 +42,7 @@ export class CandidateFoodSearchBar extends Component {
             });
         } else
             this.setState({
-                optionIDs: goThroughNodes(d => d).filter(node => {
+                optionIDs: goThroughFoodNodes(d => d).filter(node => {
                     return node[Name].indexOf(val) > -1 || getSynonymNames(node[ID]).join('|').indexOf(val) > -1;
                 }).map(node => node[ID]).filter((d, i, self) => self.indexOf(d) === i)
             });
@@ -77,6 +77,8 @@ export class CandidateFoodSearchBar extends Component {
             optionIDs.push(this.props.value);
         return optionIDs.map(id => {
             let node = getFoodNode(id);
+            if (!node)
+                return null;
             return (
                 <Option value={id} key={id}>
                     <Popover overlayClassName='popOver' getPopupContainer={this.getPopupContainer} placement='left'
@@ -88,30 +90,36 @@ export class CandidateFoodSearchBar extends Component {
                         <span className='candidatePath'>{node[Path]}</span>
                     </Popover>
                 </Option>);
-        })
+        }).filter(d => d);
     };
 
     render() {
+        let value = this.props.value;
+        if (value === '')
+            value = undefined;
         return (
-            <Select
-                allowClear
-                showSearch
-                id='foodSelection'
-                size='large'
-                style={{width: 500}}
-                placeholder="选择候选项，如无合适候选，输入名称搜索"
-                notFoundContent="没有找到相关标准食品！"
-                value={this.props.value}
-                onSelect={this.onSelect}
-                // optionFilterProp="children"
-                onChange={this.onChange}
-                onFocus={this.onFocus}
-                // onBlur={onBlur}
-                onSearch={this.onSearch}
-                filterOption={this.filterOption}//{(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-            >
-                {this.options()}
-            </Select>
+            <div className='selectTrees' id='candidateStandardFoodSearchTree'>
+                <Select
+                    allowClear
+                    showSearch
+                    id='foodSelection'
+                    className='select'
+                    size='large'
+                    placeholder="选择候选项，如无合适候选，输入名称搜索"
+                    notFoundContent="没有找到相关标准食品！"
+                    value={value}
+                    onSelect={this.onSelect}
+                    // optionFilterProp="children"
+                    onChange={this.onChange}
+                    onFocus={this.onFocus}
+                    // onBlur={onBlur}
+                    onSearch={this.onSearch}
+                    filterOption={this.filterOption}//{(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                    getPopupContainer={() => document.getElementById('candidateStandardFoodSearchTree')}
+                >
+                    {this.options()}
+                </Select>
+            </div>
         )
     }
 }

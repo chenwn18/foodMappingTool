@@ -1,22 +1,19 @@
 import React, {Component} from 'react'
 import {Tree, Input, Popover} from 'antd'
-import {goThroughNodes, getParentFoodID, getRootFoodID, getFoodNode, getSynonymNames, ID, Name} from "../lib/getData";
+import {
+    goThroughFoodNodes,
+    getParentFoodID,
+    getRootFoodID,
+    getFoodNode,
+    getSynonymNames,
+    ID,
+    Name
+} from "../lib/getData";
 import './standardFoodTree.css'
 import {StandardFoodDetail} from "./standardFoodDetail";
 
 const {TreeNode} = Tree;
 const Search = Input.Search;
-
-// const standardFoodNodeDict = getStandardFoods();
-// const standardAttributesDict = getStandardAttributes();
-// const generalFoods = getFieldFoods();
-// const ParentID = 'parent_id';
-// const Name = 'name';
-// const ID = 'id';
-// const Synonyms = 'synonyms';
-// const Path = 'path';
-// const Entity = 'entity';
-// const rootID = findRootNodeID(standardFoodNodeDict);
 
 export class StandardFoodTree extends Component {
     state = {
@@ -46,7 +43,7 @@ export class StandardFoodTree extends Component {
             });
             return;
         }
-        const expandedKeys = goThroughNodes((item) => {
+        const expandedKeys = goThroughFoodNodes((item) => {
             if (this.containQueryValue(item, value)) {
                 return getParentFoodID(item[ID]);
             }
@@ -57,6 +54,11 @@ export class StandardFoodTree extends Component {
             searchValue: value,
             autoExpandParent: true,
         });
+    };
+    onSelect = (selectedKeys) => {
+        if (!selectedKeys || selectedKeys.length === 0)
+            return;
+        this.props.setStandardFoodID(selectedKeys[0]);
     };
 
     render() {
@@ -87,7 +89,10 @@ export class StandardFoodTree extends Component {
                              content={<StandardFoodDetail id={item[ID]} searchValue={searchValue}
                                                           setStandardFoodID={this.props.setStandardFoodID.bind(this)}
                                                           setStandardAttributeIDs={this.props.setStandardAttributeIDs.bind(this)}
-                                                          setGeneralFoodID={this.props.setGeneralFoodID.bind(this)}/>}>
+                                                          setGeneralFoodID={this.props.setGeneralFoodID.bind(this)}
+                                                          setField={this.props.setField.bind(this)}
+                                                          setMappingBoxHighlight={this.props.setMappingBoxHighlight.bind(this)}
+                             />}>
                         {title}
                     </Popover>}>
                     {loop(item.children)}
@@ -102,6 +107,7 @@ export class StandardFoodTree extends Component {
                     onExpand={this.onExpand}
                     expandedKeys={expandedKeys}
                     autoExpandParent={autoExpandParent}
+                    onSelect={this.onSelect}
                 >
                     {loop([getRootFoodID()])}
                 </Tree>

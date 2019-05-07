@@ -7,6 +7,9 @@ backend/templates/
 
 # dependencies
 frontend/node_modules
+frontend/package-lock.json
+frontend/package.json
+
 # testing
 frontend/coverage
 frontend/src/testData/
